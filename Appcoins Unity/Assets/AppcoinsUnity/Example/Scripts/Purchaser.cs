@@ -4,13 +4,14 @@ using UnityEngine;
 using UnityEngine.UI;
 using Codeberg.AppcoinsUnity;
 
+//Inherit from the AppcoinsPurchaser Class
 public class Purchaser : AppcoinsPurchaser {
 
 	public Text message;
 
 
 	void Start(){
-		message.text = "Welcome to cody's snacks shop!";
+		message.text = "Welcome to cody snacks shop!";
 	}
 
 	public override void purchaseSuccess (string skuid)
@@ -46,7 +47,7 @@ public class Purchaser : AppcoinsPurchaser {
 	}
 
 
-	//method called when you click their respective buttons to purchase snacks
+	//methods starts the purchase flow when you click their respective buttons to purchase snacks
 	public void buyDodo(){
 		makePurchase ("dodo");
 	}

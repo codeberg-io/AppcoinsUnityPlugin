@@ -1,6 +1,5 @@
 ﻿//created by Lukmon Agboola(Codeberg)
-//Note: do not change anything here as it may break the workings of the plugin else you're very sure of
-//what you're doing.
+//Note: do not change anything here as it may break the workings of the plugin else you're very sure of what you're doing.
 
 using System.Collections;
 using System.Collections.Generic;
@@ -13,6 +12,10 @@ public class AppcoinsUnity : MonoBehaviour {
 
 	[Header("Your wallet address for receiving Appcoins")]
 	public string receivingAddress;
+	[Header("Uncheck to disable Appcoins IAB")]
+	public bool enableIAB = true;
+	[Header("Uncheck to disable Appcoins ADS(Proof of attention)")]
+	public bool enablePOA = true;
 	[Header("Enable debug to use testnets e.g Ropsten")]
 	public bool enableDebug = false;
 	[Header("Add all your products here")]
@@ -35,6 +38,12 @@ public class AppcoinsUnity : MonoBehaviour {
 		//set debug mode
 		//NOTE: this allows you to make purchases with testnets e.g Ropsten
 		_class.CallStatic("enableDebug",enableDebug);
+
+			//Enable or disable In App Billing
+			_class.CallStatic("enableIAB",enableIAB);
+
+			//Enable or disable ADS or Proof of Attention
+			_class.CallStatic("enablePOA",enablePOA);
 
 		//add all your skus here
 		addAllSKUs();

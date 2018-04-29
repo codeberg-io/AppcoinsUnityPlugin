@@ -1,5 +1,5 @@
 ﻿//created by Lukmon Agboola(Codeberg)
-//Extend this class to create your own purchaser class, see the example scene for more info
+//Inherit this class to create your own purchaser class, see the example scene for more info
 
 using System.Collections;
 using System.Collections.Generic;
