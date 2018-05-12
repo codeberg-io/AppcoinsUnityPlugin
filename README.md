@@ -35,7 +35,7 @@ To create an AppcoinsProduct click Assets/Create/Appcoins Product and fill in th
 
 7. Create purchaser class in Unity C# by inheriting from the AppcoinsPurchaser Class:
 
-'''
+```
 
 //add this namespace to your script to give you  access to the plugin classes.
 using Codeberg.AppcoinsUnity;
@@ -71,7 +71,7 @@ public class Purchaser : AppcoinsPurchaser {
 		makePurchase ("chocolate");
 	}
 }
-'''
+```
 
 8. Create an object in your scene and add the purchaser script you created to it. Drag and drop the purchaser object to the slot where you have the Purchaser Object on the AppcoinsUnity prefab you added to your scene earlier.
 
@@ -86,7 +86,7 @@ public class Purchaser : AppcoinsPurchaser {
 
 Unity uses an older version of gradle so change to 3.0.0 or higher
 
-'''
+```
 
 buildscript {
 
@@ -127,17 +127,17 @@ android {
    }
 
 }
-'''
+```
 
 12. Open the UnityPlayerActivity java class from the src folder and add or change the code below.
 
-'''
+```
 
  @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         UnityAppcoins.instance.onActivityResult(requestCode, resultCode, data);
 }
-'''
+```
 
 13. Sync gradle project, Rebuild project and build APK.
