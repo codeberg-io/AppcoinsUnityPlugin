@@ -84,14 +84,14 @@ public class Purchaser : AppcoinsPurchaser {
 
 11. Open the project’s gradle script and add or change this lines 
 
-Unity uses an older version of gradle so change to 3.0.0 or higher
+Unity uses an older version of gradle so change to 3.0.1 or higher
 
 ```
 
 buildscript {
 
 dependencies {
-  classpath 'com.android.tools.build:gradle:3.0.0'
+  classpath 'com.android.tools.build:gradle:3.0.1'
 }
 }
 
@@ -118,7 +118,7 @@ android {
       multiDexEnabled true
     }
      dexOptions {
-         javaMaxHeapSize "2g"
+         javaMaxHeapSize "4g"
      }
    
     compileOptions {

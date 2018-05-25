@@ -43,7 +43,13 @@ public class UnityAppcoins extends Fragment {
     public static void makePurchase(String skuid)
     {
         if(Application.getIABFlag()) {
-            appCoinsSdk.buy(skuid, instance.getActivity());
+            appCoinsSdk.buy(skuid, instance.getActivity()).subscribe(() -> {
+                // In this case the buy process was triggered as expected.
+            }, throwable -> {
+                // There was an error triggering the buy process.
+                throwable.printStackTrace();
+            });
+
         }
     }
 
