@@ -1,0 +1,1 @@
+export UNITY_PATH="/Applications/Unity/Hub/Editor/2018.2.0b6/Unity.app/Contents/MacOS/Unity"; export PROJ_PATH="/Users/nunomonteiro/Documents/GitHub/AppcoinsUnityPlugin/Appcoins Unity"; sh packageExporter.sh
