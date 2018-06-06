@@ -9,14 +9,14 @@ public class ExportPackageAutomatically : ScriptableObject
         string[] assetsPath = new string[] {"Assets/AppcoinsUnity",
                                "Assets/Plugins"};
 
-        UnityEngine.Debug.Log(assetsPath[0] + " - " + assetsPath[1]);
-
         string packagePath = Application.dataPath +
                                         "/../../" + 
                                         "AppCoins_Unity_Package.unitypackge";
         
         ExportPackageOptions options = ExportPackageOptions.Recurse;
         AssetDatabase.ExportPackage(assetsPath, packagePath, options);
+
+        UnityEngine.Debug.Log("Export done successfully");
     }
 
     /*public static void PackageDemo()
