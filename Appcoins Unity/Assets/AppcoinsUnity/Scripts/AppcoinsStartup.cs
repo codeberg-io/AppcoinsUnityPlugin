@@ -18,7 +18,7 @@ public class Startup
 
         //Check if the bunde id is the default one and change it if it to avoid that error
         if (PlayerSettings.applicationIdentifier == DEFAULT_UNITY_PACKAGE_IDENTIFIER)
-            PlayerSettings.applicationIdentifier = "com.aptoide.sample";
+            PlayerSettings.applicationIdentifier = "com.aptoide.appcoins";
 
         Debug.Log("Successfully integrated Appcoins Unity plugin!");
     }
