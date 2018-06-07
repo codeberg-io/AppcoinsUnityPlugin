@@ -4,6 +4,8 @@ package com.codeberg.appcoinsunity;
  * Created by codeberg on 3/29/2018.
  */
 
+import android.util.Log;
+
 import com.asf.appcoins.sdk.ads.AppCoinsAds;
 import com.asf.appcoins.sdk.ads.AppCoinsAdsBuilder;
 import com.asf.appcoins.sdk.iab.AppCoinsIab;
@@ -28,9 +30,11 @@ public class Application extends android.app.Application {
     public void onCreate() {
         super.onCreate();
         application=this;
+        Log.d("UnityActivity", "Aplication began.");
     }
 
     public static void setupSDK(String developerAddress){
+        Log.d("UnityActivity", "Set up SDK began.");
 
         if(POAFlag) {
             adsSdk = new AppCoinsAdsBuilder().withDebug(debugFlag)
