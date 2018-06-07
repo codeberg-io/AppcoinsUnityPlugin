@@ -43,6 +43,13 @@ sysinfo.txt
 !.vscode/launch.json
 !.vscode/extensions.json
 .history
+/.vscode/*
+/!.vscode/settings.json
+/!.vscode/tasks.json
+/!.vscode/launch.json
+/!.vscode/extensions.json
+/.history
+
 
 ### VisualStudio ###
 ## Ignore Visual Studio temporary files, build results, and
