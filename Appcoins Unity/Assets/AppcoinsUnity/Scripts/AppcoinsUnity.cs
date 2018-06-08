@@ -3,6 +3,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -23,6 +24,8 @@ public class AppcoinsUnity : MonoBehaviour {
 	[Header("Add your purchaser object here")]
 	public AppcoinsPurchaser purchaserObject;
 
+	private bool previousEnablePOA = true;
+
 	AndroidJavaClass _class;
 	AndroidJavaObject instance { get { return _class.GetStatic<AndroidJavaObject>("instance"); } }
 
@@ -42,15 +45,23 @@ public class AppcoinsUnity : MonoBehaviour {
 			//Enable or disable In App Billing
 			_class.CallStatic("enableIAB",enableIAB);
 
-			//Enable or disable ADS or Proof of Attention
-			_class.CallStatic("enablePOA",enablePOA);
-
 		//add all your skus here
 		addAllSKUs();
 
 		//start sdk
 		_class.CallStatic("start");
 
+	}
+
+	// This function is called when this script is loaded or some variable changes its value.
+	void OnValidate() {
+
+		// Put new value of enablePOA in mainTemplate.gradle to enable it or disable it.
+		if(previousEnablePOA != enablePOA) {
+			previousEnablePOA = enablePOA;
+
+			changeMainTemplateGradle(previousEnablePOA);
+		}
 	}
 
 
@@ -75,6 +86,44 @@ public class AppcoinsUnity : MonoBehaviour {
 	public void purchaseFailure(string skuid){
 			purchaserObject.purchaseFailure (skuid);
 	}
- }
 
+	// Change the mainTemplate.gradle's ENABLE_POA var to its new value
+	private void changeMainTemplateGradle(bool POA) {
+		string pathToMainTemplate = Application.dataPath + "/Plugins/Android/mainTemplate.gradle"; // Path to mainTemplate.gradle
+		string line;
+		string contentToChange = "\tsystemProperty 'ENABLE_POA', '" + POA.ToString().ToLower() + "'"; //Line to change inside test container
+		string contentInTemplate = "\tsystemProperty 'ENABLE_POA', '" + (!POA).ToString().ToLower() + "'";
+		int lineToChange = -1;
+		int counter = 0;
+		ArrayList fileLines = new ArrayList();
+
+		System.IO.StreamReader fileReader = new System.IO.StreamReader(pathToMainTemplate);  
+		
+		//Read all lines and get the line numer to be changed
+		while((line = fileReader.ReadLine()) != null) {
+			//Debug.Log(line);
+			fileLines.Add(line);
+
+			if(line.Length >= contentInTemplate.Length && line.Substring(0, contentInTemplate.Length).Equals(contentInTemplate)) {
+				lineToChange = counter;
+			} 
+
+			counter++;
+		}
+
+		fileReader.Close();
+
+		if(lineToChange > -1) {
+			fileLines[lineToChange] = contentToChange;
+		}
+
+		System.IO.StreamWriter fileWriter = new System.IO.StreamWriter(pathToMainTemplate);
+
+		foreach(string newLine in fileLines) {
+			fileWriter.WriteLine(newLine);
+		}
+
+		fileWriter.Close();
+	}
+ }
 }
