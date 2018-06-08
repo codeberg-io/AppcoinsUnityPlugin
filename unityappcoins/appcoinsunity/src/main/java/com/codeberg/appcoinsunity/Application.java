@@ -30,19 +30,27 @@ public class Application extends android.app.Application {
     public void onCreate() {
         super.onCreate();
         application=this;
+        setupAdsSDK();
         Log.d("UnityActivity", "Aplication began.");
+    }
+
+    public void setupAdsSDK() {
+        final String poaValue = System.getProperty("ENABLE_POA", "false");
+        Log.d("UnityActivity", "POA should be " + poaValue);
+        if(poaValue == "true") {
+
+            Log.d("UnityActivity", "POA sdk initialized");
+            adsSdk = new AppCoinsAdsBuilder().withDebug(debugFlag)
+                    .createAdvertisementSdk(application);
+            adsSdk.init(application);
+        }
     }
 
     public static void setupSDK(String developerAddress){
         Log.d("UnityActivity", "Set up SDK began.");
 
-        if(POAFlag) {
-            adsSdk = new AppCoinsAdsBuilder().withDebug(debugFlag)
-                    .createAdvertisementSdk(application);
-            adsSdk.init(application);
-        }
-
         if(IABFlag) {
+            Log.d("UnityActivity", "IAB sdk initialized");
             appCoinsSdk = new AppCoinsIabBuilder(developerAddress).withSkus(buildSkus())
                     .withDebug(debugFlag)
                     .createAppCoinsIab();
