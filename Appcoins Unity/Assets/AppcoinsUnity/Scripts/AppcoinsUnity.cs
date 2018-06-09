@@ -91,21 +91,28 @@ public class AppcoinsUnity : MonoBehaviour {
 	private void changeMainTemplateGradle(bool POA) {
 		string pathToMainTemplate = Application.dataPath + "/Plugins/Android/mainTemplate.gradle"; // Path to mainTemplate.gradle
 		string line;
-		string contentToChange = "\tsystemProperty 'ENABLE_POA', '" + POA.ToString().ToLower() + "'"; //Line to change inside test container
-		string contentInTemplate = "\tsystemProperty 'ENABLE_POA', '" + (!POA).ToString().ToLower() + "'";
+		string contentToChange = "resValue 'string', 'ENABLE_POA', '" + POA.ToString().ToLower() + "'"; //Line to change inside test container
+		string contentInTemplate = "resValue 'string', 'ENABLE_POA', '" + (!POA).ToString().ToLower() + "'";
 		int lineToChange = -1;
 		int counter = 0;
+		int numberOfSpaces = 0;
 		ArrayList fileLines = new ArrayList();
 
 		System.IO.StreamReader fileReader = new System.IO.StreamReader(pathToMainTemplate);  
 		
 		//Read all lines and get the line numer to be changed
 		while((line = fileReader.ReadLine()) != null) {
-			//Debug.Log(line);
 			fileLines.Add(line);
 
-			if(line.Length >= contentInTemplate.Length && line.Substring(0, contentInTemplate.Length).Equals(contentInTemplate)) {
+			//Get the new line and number of spaces erased.
+			ArrayList a = RemoveFirstsWhiteSpaces(line);
+			line = (string) a[0];
+
+			//Debug.Log(line);
+
+			if(line.Length == contentInTemplate.Length && line.Substring(0, contentInTemplate.Length).Equals(contentInTemplate)) {
 				lineToChange = counter;
+				numberOfSpaces = (int) a[1];
 			} 
 
 			counter++;
@@ -114,6 +121,10 @@ public class AppcoinsUnity : MonoBehaviour {
 		fileReader.Close();
 
 		if(lineToChange > -1) {
+			for(int i = 0; i < numberOfSpaces; i++) {
+				contentToChange = string.Concat(" ", contentToChange);
+			}
+
 			fileLines[lineToChange] = contentToChange;
 		}
 
@@ -124,6 +135,30 @@ public class AppcoinsUnity : MonoBehaviour {
 		}
 
 		fileWriter.Close();
+	}
+
+	private static ArrayList RemoveFirstsWhiteSpaces(string line) {
+		int lettersToRemove = 0;
+
+		foreach(char letter in line) {
+			if(char.IsWhiteSpace(letter)) {
+				lettersToRemove++;
+			}
+
+			else {
+				break;
+			}
+		}
+
+		if(lettersToRemove > 0) {
+			line = line.Substring(lettersToRemove);
+		}
+
+		ArrayList a = new ArrayList();
+		a.Add(line);
+		a.Add(lettersToRemove);
+
+		return a;
 	}
  }
 }

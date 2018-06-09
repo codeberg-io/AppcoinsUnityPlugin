@@ -35,7 +35,7 @@ public class Application extends android.app.Application {
     }
 
     public void setupAdsSDK() {
-        final String poaValue = getString(R.string.poa);
+        final String poaValue = getString(R.string.ENABLE_POA);
         Log.d("UnityActivity", "POA should be " + poaValue);
         if(poaValue.equals("true")) {
 

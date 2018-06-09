@@ -71,7 +71,7 @@ android {
       useProguard false
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-unity.txt'
       signingConfig signingConfigs.debug
-      resValue "string", "poa", "true"
+      resValue 'string', 'ENABLE_POA', 'true'
     }
   }
   packagingOptions {
