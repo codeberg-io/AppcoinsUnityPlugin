@@ -13,7 +13,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            resValue 'string', 'APPCOINS_ENABLE_POA', 'false'
+            resValue "bool", "APPCOINS_ENABLE_POA", "false"
         }
     }
     compileOptions {

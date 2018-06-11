@@ -35,9 +35,9 @@ public class Application extends android.app.Application {
     }
 
     public void setupAdsSDK() {
-        final String poaValue = getString(R.string.APPCOINS_ENABLE_POA);
+        final boolean poaValue = getResources().getBoolean(R.bool.APPCOINS_ENABLE_POA);
         Log.d("UnityActivity", "POA should be " + poaValue);
-        if(poaValue.equals("true")) {
+        if(poaValue == true) {
 
             Log.d("UnityActivity", "POA sdk initialized");
             adsSdk = new AppCoinsAdsBuilder().withDebug(debugFlag)

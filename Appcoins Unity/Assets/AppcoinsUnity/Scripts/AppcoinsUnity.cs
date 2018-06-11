@@ -91,8 +91,8 @@ public class AppcoinsUnity : MonoBehaviour {
 	private void changeMainTemplateGradle(bool POA) {
 		string pathToMainTemplate = Application.dataPath + "/Plugins/Android/mainTemplate.gradle"; // Path to mainTemplate.gradle
 		string line;
-		string contentToChange = "resValue 'string', 'APPCOINS_ENABLE_POA', '" + POA.ToString().ToLower() + "'"; //Line to change inside test container
-		string contentInTemplate = "resValue 'string', 'APPCOINS_ENABLE_POA', '" + (!POA).ToString().ToLower() + "'";
+		string contentToChange = "resValue \"bool\", \"APPCOINS_ENABLE_POA\", \"" + POA.ToString().ToLower() + "\""; //Line to change inside test container
+		string contentInTemplate = "resValue \"bool\", \"APPCOINS_ENABLE_POA\", \"" + (!POA).ToString().ToLower() + "\"";
 		int lineToChange = -1;
 		int counter = 0;
 		int numberOfSpaces = 0;
