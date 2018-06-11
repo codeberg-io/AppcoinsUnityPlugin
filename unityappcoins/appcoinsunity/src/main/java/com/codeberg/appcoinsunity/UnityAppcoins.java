@@ -67,10 +67,6 @@ public class UnityAppcoins extends Fragment {
         Application.setIAB(iab);
     }
 
-    public  static void enablePOA(boolean poa){
-        Application.setPOA(poa);
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
