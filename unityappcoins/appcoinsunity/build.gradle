@@ -28,3 +28,9 @@ dependencies {
     api 'com.asfoundation:appcoins:0.3.1a'
 }
 
+task copyAarToUnity {
+    copy {
+        from 'build/outputs/aar/appcoinsunity-release.aar'
+        into "../../Appcoins Unity/Assets/Plugins/Android"
+    }
+}
