@@ -59,10 +59,6 @@ public class UnityAppcoins extends Fragment {
         }
     }
 
-    public  static void enableDebug(boolean debug){
-        Application.setDebug(debug);
-    }
-
     public  static void enableIAB(boolean iab){
         Application.setIAB(iab);
     }

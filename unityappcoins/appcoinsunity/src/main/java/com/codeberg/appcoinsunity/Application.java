@@ -30,8 +30,20 @@ public class Application extends android.app.Application {
     public void onCreate() {
         super.onCreate();
         application=this;
+
+        //Needs to happen before anything else
+        //This will fetch the debug flag value that all other calls depend on
+        setupStoreEnvironment();
+
         setupAdsSDK();
         Log.d("UnityActivity", "Aplication began.");
+    }
+
+    public void setupStoreEnvironment() {
+        final boolean debugValue = getResources().getBoolean(R.bool.APPCOINS_ENABLE_DEBUG);
+        Log.d("UnityActivity", "Debug should be " + debugValue);
+
+        debugFlag = debugValue;
     }
 
     public void setupAdsSDK() {
@@ -65,10 +77,6 @@ public class Application extends android.app.Application {
         skus.add(new SKU(name,id, BigDecimal.valueOf(price)));
     }
 
-    public static void setDebug(boolean debug){
-        debugFlag=debug;
-    }
-
     public static void setIAB(boolean iabflag){
         IABFlag=iabflag;
     }
@@ -77,7 +85,4 @@ public class Application extends android.app.Application {
        return IABFlag;
     }
 
-    public static void setPOA(boolean poaflag){
-        POAFlag=poaflag;
-    }
 }
