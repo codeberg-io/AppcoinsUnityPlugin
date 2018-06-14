@@ -1157,6 +1157,10 @@ Prefab:
       propertyPath: enablePOA
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1087073868984312, guid: 53ffe963ba9e4624aac3b31b1619f682, type: 2}
+      propertyPath: m_Name
+      value: AppcoinsUnityTest
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 53ffe963ba9e4624aac3b31b1619f682, type: 2}
   m_IsPrefabAsset: 0
