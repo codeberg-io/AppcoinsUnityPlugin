@@ -104,9 +104,7 @@ To successfully run the project you need to:
 
 If you enabled POA, on the AppCoinsUnity object, the expected flow for the app is to show you a notification saying that the POA started
 
-//TODO screenshot showing POA notification
-
-![picture](Screenshots/shot5.png)
+![picture](Screenshots/POA.png)
 
 **Testing IAB**
 
