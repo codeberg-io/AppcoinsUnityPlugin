@@ -1,19 +1,18 @@
 # Appcoins Unity Plugin
 
-![picture](Screenshots/shot1.png)
-
-This is an unofficial unity plugin for Appcoins that allows you to integrate AppCoins in-app billing or Proof of Attention Ads into your unity android game.
+![picture](Screenshots/logos.png)
+This is the official Unity plugin for Appcoins that allows you to integrate AppCoins in-app billing or Proof of Attention Ads into your Unity android game.
 
 ## About Appcoins Unity Plugin
-This plugin is developed from an excerpt of the Super Crossbar Challenge game. We thought it would be of great help if we can help other unity developers who would be integrating the Appcoins In-App Billing into their game save precious time by providing our solution as a plugin. 
-**Note that there is no restriction to what you can do with the plugin.**
+This plugin is developed from a fork of the unofficial unity plugin for Appcoins by [codeberg-io](https://github.com/codeberg-io/AppcoinsUnityPlugin)
+. We thought it was a great initiative and decided to support the project and help all Unity developers who would be integrating the Appcoins In-App Billing into their game.
 
-## Integrating plugin into your game
-1. Download the plugin package "Appcoins Unity Plugin.unitypackage" file and open the package in your unity project, make sure to import everything in the unitypackage.
+## Integrating the plugin into your game
+1. Download the plugin package "AppCoins_Unity_Package.unitypackage" file and open the package in your Unity project (double click the file or in Unity go to Assets -> Import Package -> Custom Package.... and find the file you just downloaded). If you don't want to import the example make sure to untick the example folder, everything else is mandatory.
 
 ![picture](Screenshots/shot2.png)
 
-2. From the Assets/AppcoinsUnity/Prefabs folder drag and drop the AppcoinsUnity prefab into your scene or hierarchy window. 
+2. From the Assets -> AppcoinsUnity -> Prefabs folder drag and drop the AppcoinsUnity prefab into your scene or hierarchy window.
 **Note:do not change the name of the AppcoinsUnity prefab.**
 
 ![picture](Screenshots/shot3.png)
@@ -23,7 +22,7 @@ This plugin is developed from an excerpt of the Super Crossbar Challenge game. W
 4. check the enable debug checkbox If you would like to be able to use testnets like Ropsten for testing your Appcoins in-app billing integration.
 **Note: Uncheck this in production to avoid testnet purchases.**
 
-5. You need to create in-app products. 
+5. You need to create in-app products.
 To create an AppcoinsProduct click Assets/Create/Appcoins Product and fill in the product info. Create as many as your in app products.
 
 ![picture](Screenshots/shot4.png)
@@ -42,20 +41,20 @@ using Codeberg.AppcoinsUnity;
 
 public class Purchaser : AppcoinsPurchaser {
 
-//method gets called on successful purchases
+	//method gets called on successful purchases
 	public override void purchaseSuccess (string skuid)
 	{
 		base.purchaseSuccess (skuid);
 		//purchase is successful release the product
 	}
-//method gets called on failed purchases
+
+	//method gets called on failed purchases
 	public override void purchaseFailure (string skuid)
 	{
 		base.purchaseFailure (skuid);
 		//purchase failed perhaps show some error message
 
 	}
-
 
 	//example methods to initiate a purchase flow
     //the string parameter of the makePurchase method is the skuid you specified in the inspector for each product
@@ -77,67 +76,42 @@ public class Purchaser : AppcoinsPurchaser {
 
 ![picture](Screenshots/shot6.png)
 
-9. To build the project. The appcoins sdk which this plugin depends on is not compatible with unity's default build system or unity gradle but luckily unity allows us to export to android studio. Do not panic this is very simple. Goto your build settings in unity, change the build system to Gradle, check the export project checkbox and click export at the bottom of the build settings window.
+## To build the project:
+Go to the build menu (File -> Build Settings) and click Player Settings.
 
-10. After the project has finished exporting, we can import into Android Studio, open android studio and import project File/New/Import Project then locate the exported project folder. 
-**Note:Use Android Studio 3.0+ and set project min sdk in the android manifest file to 21**
+On the Player Settings window:
+1. Click the other settings panel
 
-11. Open the project’s gradle script and add or change this lines 
+2. Make sure you change the package name to your liking (if it was Unity's default one now it changed to com.aptoide.appcoins).
 
-Unity uses an older version of gradle so change to 3.0.1 or higher
+3. Make sure that you have min sdk version set to 21 (if the import was done correctly this should've changed automatically).
+4. Connect the phone to your machine and click "Build and Run"
 
-```
+You should have your game running on the phone!
 
-buildscript {
+## To run the project:
+To successfully run the project you need to:
+1. Download and install ASF Wallet app (you can get it on [Aptoide](https://asf-wallet-app-store-foundation.en.aptoide.com/?store_name=asf-store) or [GooglePlay](https://play.google.com/store/apps/details?id=com.asfoundation.wallet))
 
-dependencies {
-  classpath 'com.android.tools.build:gradle:3.0.1'
-}
-}
+![picture](Screenshots/asfIcon.png)
+2. Open ASF Wallet and create or restore a wallet
+3. Launch the game
 
-allprojects {
-  repositories {
-     google()
-     jcenter()
-     maven { url "https://dl.bintray.com/asf/asf" }
-     flatDir {
-       dirs 'libs'
-     }
-  }
-}
+## To make sure integration is ok:
+** Testing POA **
 
-dependencies {
-	compile fileTree(dir: 'libs', include: ['*.jar'])
-	api 'com.asfoundation:appcoins:0.3.1a'
-	compile(name: 'appcoinsunity-release', ext:'aar')
-}
+If you enabled POA, on the AppCoinsUnity object, the expected flow for the app is to show you a notification saying that the POA started
 
-android {
+//TODO screenshot showing POA notification
 
-  defaultConfig {
-      multiDexEnabled true
-    }
-     dexOptions {
-         javaMaxHeapSize "4g"
-     }
-   
-    compileOptions {
-       sourceCompatibility 1.8
-       targetCompatibility 1.8
-   }
+![picture](Screenshots/shot5.png)
 
-}
-```
+** Testing IAB **
 
-12. Open the UnityPlayerActivity java class from the src folder and add or change the code below.
+To test your purchases just follow the normal flow you do to trigger them. When they're triggered this screen should show up:
 
-```
+![picture](https://www.appstorefoundation.org/img/image-howto-donate.gif)
 
- @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        UnityAppcoins.instance.onActivityResult(requestCode, resultCode, data);
-}
-```
+-Make sure you test both the success and failure cases!
 
-13. Sync gradle project, Rebuild project and build APK.
+You're DONE! Congrats!
