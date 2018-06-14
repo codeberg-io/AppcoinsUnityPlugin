@@ -1,6 +1,7 @@
 # Appcoins Unity Plugin
 
 ![picture](Screenshots/logos.png)
+
 This is the official Unity plugin for Appcoins that allows you to integrate AppCoins in-app billing or Proof of Attention Ads into your Unity android game.
 
 ## About Appcoins Unity Plugin
@@ -27,7 +28,7 @@ To create an AppcoinsProduct click Assets/Create/Appcoins Product and fill in th
 
 ![picture](Screenshots/shot4.png)
 
-6. Drag and drop all the product you created to the field on the AppcoinsUnity gameobject where you have products.
+6. Drag and drop all the products you created to the field on the AppcoinsUnity gameobject where you have products.
 **Note: in the image below i created and added 3 products Chocolate, Dodo and Monster Drink.**
 
 ![picture](Screenshots/shot5.png)
@@ -57,7 +58,7 @@ public class Purchaser : AppcoinsPurchaser {
 	}
 
 	//example methods to initiate a purchase flow
-    //the string parameter of the makePurchase method is the skuid you specified in the inspector for each product
+	//the string parameter of the makePurchase method is the skuid you specified in the inspector for each product
 	public void buyDodo(){
 		makePurchase ("dodo");
 	}
@@ -76,7 +77,7 @@ public class Purchaser : AppcoinsPurchaser {
 
 ![picture](Screenshots/shot6.png)
 
-## To build the project:
+## To build the project
 Go to the build menu (File -> Build Settings) and click Player Settings.
 
 On the Player Settings window:
@@ -89,16 +90,17 @@ On the Player Settings window:
 
 You should have your game running on the phone!
 
-## To run the project:
+## To run the project
 To successfully run the project you need to:
 1. Download and install ASF Wallet app (you can get it on [Aptoide](https://asf-wallet-app-store-foundation.en.aptoide.com/?store_name=asf-store) or [GooglePlay](https://play.google.com/store/apps/details?id=com.asfoundation.wallet))
 
 ![picture](Screenshots/asfIcon.png)
+
 2. Open ASF Wallet and create or restore a wallet
 3. Launch the game
 
-## To make sure integration is ok:
-** Testing POA **
+## To make sure integration is ok
+**Testing POA**
 
 If you enabled POA, on the AppCoinsUnity object, the expected flow for the app is to show you a notification saying that the POA started
 
@@ -106,7 +108,7 @@ If you enabled POA, on the AppCoinsUnity object, the expected flow for the app i
 
 ![picture](Screenshots/shot5.png)
 
-** Testing IAB **
+**Testing IAB**
 
 To test your purchases just follow the normal flow you do to trigger them. When they're triggered this screen should show up:
 
