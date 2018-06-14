@@ -9,6 +9,7 @@ This plugin is developed from a fork of the unofficial unity plugin for Appcoins
 . We thought it was a great initiative and decided to support the project and help all Unity developers who would be integrating the Appcoins In-App Billing into their game.
 
 ## Integrating the plugin into your game
+
 1. Download the plugin package "AppCoins_Unity_Package.unitypackage" file and open the package in your Unity project (double click the file or in Unity go to Assets -> Import Package -> Custom Package.... and find the file you just downloaded). If you don't want to import the example make sure to untick the example folder, everything else is mandatory.
 
 ![picture](Screenshots/shot2.png)
@@ -78,6 +79,9 @@ public class Purchaser : AppcoinsPurchaser {
 ![picture](Screenshots/shot6.png)
 
 ## To build the project
+
+**Unity 2018.2b (and above)**
+
 Go to the build menu (File -> Build Settings) and click Player Settings.
 
 On the Player Settings window:
@@ -89,6 +93,22 @@ On the Player Settings window:
 4. Connect the phone to your machine and click "Build and Run"
 
 You should have your game running on the phone!
+
+**Unity 2018.1.X**
+
+Coming soon!
+
+**Unity 2017.X**
+
+Coming soon!
+
+**Unity 5.6.X**
+
+Coming soon!
+
+**Unity 5.5.X**
+
+Coming soon!
 
 ## To run the project
 To successfully run the project you need to:
@@ -113,5 +133,15 @@ To test your purchases just follow the normal flow you do to trigger them. When 
 ![picture](https://www.appstorefoundation.org/img/image-howto-donate.gif)
 
 -Make sure you test both the success and failure cases!
+
+**Note: You can test the purchase flow right from the Editor to easily check both flows without having to build for the device**
+
+Trying to make the purchase through the Editor should display a popup like this:
+
+![picture](Screenshots/editorPopup.png)
+
+Pressing "Test success" will go through with the flow as if the purchase was successful (purchaseSuccess on Purchaser will be called).
+
+Pressing "Test failure" will go through with the flow as if the purchase failed or was canceled (purchaseFailed on Purchaser will be called).
 
 You're DONE! Congrats!
