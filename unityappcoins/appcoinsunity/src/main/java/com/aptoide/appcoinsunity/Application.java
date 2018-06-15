@@ -1,7 +1,8 @@
-package com.codeberg.appcoinsunity;
+package com.aptoide.appcoinsunity;
 
 /**
  * Created by codeberg on 3/29/2018.
+ * Modified by Aptoide
  */
 
 import android.util.Log;

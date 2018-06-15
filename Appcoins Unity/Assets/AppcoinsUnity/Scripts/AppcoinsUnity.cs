@@ -1,4 +1,5 @@
 ﻿//created by Lukmon Agboola(Codeberg)
+//Modified by Aptoide
 //Note: do not change anything here as it may break the workings of the plugin else you're very sure of what you're doing.
 
 #if UNITY_EDITOR
@@ -11,7 +12,7 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Codeberg.AppcoinsUnity
+namespace Aptoide.AppcoinsUnity
 {
 
     public class AppcoinsUnity : MonoBehaviour
@@ -46,7 +47,7 @@ namespace Codeberg.AppcoinsUnity
         {
 
             //get refference to java class
-            _class = new AndroidJavaClass("com.codeberg.appcoinsunity.UnityAppcoins");
+            _class = new AndroidJavaClass("com.aptoide.appcoinsunity.UnityAppcoins");
 
             //setup wallet address
             _class.CallStatic("setAddress", receivingAddress);

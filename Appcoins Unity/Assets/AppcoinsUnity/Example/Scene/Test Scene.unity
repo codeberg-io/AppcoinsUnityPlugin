@@ -1127,7 +1127,7 @@ Prefab:
     - target: {fileID: 114267058133941440, guid: 53ffe963ba9e4624aac3b31b1619f682,
         type: 2}
       propertyPath: enableDebug
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 114267058133941440, guid: 53ffe963ba9e4624aac3b31b1619f682,
         type: 2}
@@ -1160,6 +1160,16 @@ Prefab:
     - target: {fileID: 1087073868984312, guid: 53ffe963ba9e4624aac3b31b1619f682, type: 2}
       propertyPath: m_Name
       value: AppcoinsUnityTest
+      objectReference: {fileID: 0}
+    - target: {fileID: 114267058133941440, guid: 53ffe963ba9e4624aac3b31b1619f682,
+        type: 2}
+      propertyPath: products.Array.data[3]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 114267058133941440, guid: 53ffe963ba9e4624aac3b31b1619f682,
+        type: 2}
+      propertyPath: products.Array.data[4]
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 53ffe963ba9e4624aac3b31b1619f682, type: 2}

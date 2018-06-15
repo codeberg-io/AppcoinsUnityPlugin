@@ -1,4 +1,4 @@
-package com.codeberg.appcoinsunity;
+package com.aptoide.appcoinsunity;
 
 import android.app.Fragment;
 import android.content.Intent;
@@ -7,10 +7,11 @@ import android.os.Bundle;
 import com.asf.appcoins.sdk.iab.payment.PaymentStatus;
 import com.unity3d.player.UnityPlayer;
 
-import static com.codeberg.appcoinsunity.Application.appCoinsSdk;
+import static com.aptoide.appcoinsunity.Application.appCoinsSdk;
 
 /**
  * Created by codeberg on 3/21/2018.
+ * Modified by Aptoide
  */
 
 public class UnityAppcoins extends Fragment {

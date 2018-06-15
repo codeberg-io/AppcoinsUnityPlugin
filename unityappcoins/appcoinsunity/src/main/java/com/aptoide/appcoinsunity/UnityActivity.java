@@ -1,4 +1,4 @@
-package com.codeberg.appcoinsunity;
+package com.aptoide.appcoinsunity;
 import com.unity3d.player.UnityPlayerActivity;
 
 import android.content.Intent;

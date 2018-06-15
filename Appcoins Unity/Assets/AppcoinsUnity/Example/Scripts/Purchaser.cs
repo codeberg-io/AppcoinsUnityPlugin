@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Codeberg.AppcoinsUnity;
+using Aptoide.AppcoinsUnity;
 
 //Inherit from the AppcoinsPurchaser Class
 public class Purchaser : AppcoinsPurchaser {
