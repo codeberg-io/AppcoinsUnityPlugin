@@ -1,16 +1,16 @@
-# Appcoins Unity Plugin
+# AppCoins Unity Plugin
 
 ![picture](Screenshots/logos.png)
 
-This is the official Unity plugin for Appcoins that allows you to integrate AppCoins in-app billing or Proof of Attention Ads into your Unity android game.
+This is the official Unity plugin for the AppCoins Protocol that allows you to integrate AppCoins In-App Billing or Proof-of-Attention Ads into your Unity Android game.
 
-## About Appcoins Unity Plugin
-This plugin is developed from a fork of the unofficial unity plugin for Appcoins by [codeberg-io](https://github.com/codeberg-io/AppcoinsUnityPlugin)
-. We thought it was a great initiative and decided to support the project and help all Unity developers who would be integrating the Appcoins In-App Billing into their game.
+## About AppCoins Unity Plugin
+This plugin is developed from a fork of the unofficial unity plugin for AppCoins by [codeberg-io](https://github.com/codeberg-io/AppcoinsUnityPlugin).
+ We thought it was a great initiative and decided to support the project and help all Unity developers who would be integrating the AppCoins In-App Billing into their game.
 
 ## Integrating the plugin into your game
 
-1. Download the plugin package [AppCoins_Unity_Package.unitypackage](https://github.com/AppStoreFoundation/AppcoinsUnityPlugin/blob/develop/AppCoins_Unity_Package.unitypackage) file and open the package in your Unity project (double click the file or in Unity go to Assets -> Import Package -> Custom Package.... and find the file you just downloaded). If you don't want to import the example make sure to untick the example folder, everything else is mandatory.
+1. Download the plugin package [AppCoins_Unity_Package.unitypackage](https://github.com/AppStoreFoundation/AppcoinsUnityPlugin/blob/develop/AppCoins_Unity_Package.unitypackage) file and open the package in your Unity project (double click the file or in Unity go to Assets -> Import Package -> Custom Package.... and find the file you just downloaded). If you don't want to import the example, make sure to untick the example folder. Everything else is mandatory.
 
 ![picture](Screenshots/shot2.png)
 
@@ -18,18 +18,18 @@ This plugin is developed from a fork of the unofficial unity plugin for Appcoins
 
 ![picture](Screenshots/shot3.png)
 
-3. In the inspector window where you have receiving address change the text to your appcoins wallet address where you would like to receive your appcoins.
+3. In the inspector window where you have _Receiving Address_, change the text to your AppCoins wallet address where you would like to receive your AppCoins.
 
-4. check the enable debug checkbox If you would like to be able to use testnets like Ropsten for testing your Appcoins in-app billing integration.
+4. Check the enable debug checkbox if you would like to be able to use testnets like Ropsten for testing your AppCoins In-App Billing integration.
 **Note: Uncheck this in production to avoid testnet purchases.**
 
 5. You need to create in-app products.
-To create an AppcoinsProduct click Assets/Create/Appcoins Product and fill in the product info. Create as many as your in app products.
+To create an AppcoinsProduct, click Assets/Create/Appcoins Product and fill in the product info. Create as many as your in-app products.
 
 ![picture](Screenshots/shot4.png)
 
-6. Drag and drop all the products you created to the field on the AppcoinsUnity gameobject where you have products.
-**Note: in the image below i created and added 3 products Chocolate, Dodo and Monster Drink.**
+6. Drag and drop all the products you've created to the field on the AppcoinsUnity gameobject where you have products.
+**Note: in the image below I created and added 3 products Chocolate, Dodo and Monster Drink.**
 
 ![picture](Screenshots/shot5.png)
 
@@ -121,13 +121,13 @@ To successfully run the project you need to:
 ## To make sure integration is ok
 **Testing POA**
 
-If you enabled POA, on the AppCoinsUnity object, the expected flow for the app is to show you a notification saying that the POA started
+If you enabled PoA, on the AppCoinsUnity object, the expected flow for the app is to show you a notification saying that the PoA started
 
 ![picture](Screenshots/poa.png)
 
 **Testing IAB**
 
-To test your purchases just follow the normal flow you do to trigger them. When they're triggered this screen should show up:
+To test your purchases, just follow the normal flow you do to trigger them. When they're triggered, this screen should show up:
 
 ![picture](https://www.appstorefoundation.org/img/image-howto-donate.gif)
 
