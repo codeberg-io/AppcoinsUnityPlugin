@@ -6,9 +6,18 @@ public class ExportPackageAutomatically : ScriptableObject
     [MenuItem("Export Package/Unity 2018.b")]
     public static void ExportFromUnity2018()
     {
-        string[] assetsPath = new string[] {"Assets/AppcoinsUnity/Example", "Assets/AppcoinsUnity/Prefabs", "Assets/AppcoinsUnity/Scripts/AppcoinsPurchaser.cs",
-                                            "Assets/AppcoinsUnity/Scripts/AppcoinsSku.cs", "Assets/AppcoinsUnity/Scripts/AppcoinsUnity.cs", 
-                                            "Assets/AppcoinsUnity/Scripts/Editor/AppcoinsStartup.cs", "Assets/Plugins"};
+        string[] assetsPath = new string[] {
+            "Assets/AppcoinsUnity/Example",
+            "Assets/AppcoinsUnity/Prefabs",
+            "Assets/AppcoinsUnity/Scripts/AppcoinsPurchaser.cs",
+            "Assets/AppcoinsUnity/Scripts/AppcoinsSku.cs",
+            "Assets/AppcoinsUnity/Scripts/AppcoinsUnity.cs",
+            "Assets/AppcoinsUnity/Scripts/Editor/AppcoinsStartup.cs",
+            "Assets/AppcoinsUnity/Scripts/Editor/AppCoinsProductEditor.cs",
+            "Assets/AppcoinsUnity/Scripts/Editor/ProductMaker.cs",
+            "Assets/AppcoinsUnity/Scripts/Editor/CustomBuild.cs",
+            "Assets/Plugins"
+        };
 
         string packagePath = Application.dataPath +
                                         "/../../" + 

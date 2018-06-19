@@ -14,7 +14,7 @@ This plugin is developed from a fork of the unofficial unity plugin for AppCoins
 
 ![picture](Screenshots/shot2.png)
 
-2. From the Assets -> AppcoinsUnity -> Prefabs folder drag and drop the _AppcoinsUnity_ prefab into your scene or hierarchy window. Previously this object had a dependency on its name... not anymore! You can rename it freely if you wish to!
+2. From the Assets -> AppcoinsUnity -> Prefabs folder drag and drop the _AppcoinsUnity_ prefab into your scene or hierarchy window. ** Note:do not change the name of the AppcoinsUnity prefab.**
 
 ![picture](Screenshots/shot3.png)
 
