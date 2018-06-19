@@ -24,21 +24,24 @@ This plugin is developed from a fork of the unofficial unity plugin for Appcoins
 **Note: Uncheck this in production to avoid testnet purchases.**
 
 5. You need to create in-app products.
-To create an AppcoinsProduct click Assets/Create/Appcoins Product and fill in the product info. Create as many as your in app products.
+To create an AppcoinsProduct click Assets/Create/AppCoins Product, fill in the product info and click Apply. Everytime you make a change to the product you should click Apply. This will create the product in a folder called "Products" inside the Assets folder. Create as many as your in app products.
 
-![picture](Screenshots/shot4.png)
+![picture](Screenshots/CreateAppcoinsProduct.png)
 
 6. Drag and drop all the products you created to the field on the AppcoinsUnity gameobject where you have products.
-**Note: in the image below i created and added 3 products Chocolate, Dodo and Monster Drink.**
+
+**Note: in the image below 3 products were created and added (Chocolate, Dodo and Monster Drink).**
 
 ![picture](Screenshots/shot5.png)
+
+**Note: Checking "Add to list" while creating the product will add the product to the products list automatically for you**
 
 7. Create purchaser class in Unity C# by inheriting from the AppcoinsPurchaser Class:
 
 ```
 
 //add this namespace to your script to give you  access to the plugin classes.
-using Codeberg.AppcoinsUnity;
+using Aptoide.AppcoinsUnity;
 
 public class Purchaser : AppcoinsPurchaser {
 
