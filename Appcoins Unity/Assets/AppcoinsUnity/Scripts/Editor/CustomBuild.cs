@@ -6,10 +6,6 @@ using System.Diagnostics;
 
 public class CustomBuild : EditorWindow
 {
-    private static bool continueBuild = false;
-
-    private static UnityEvent continueProcessEvent = new UnityEvent();
-
     // Custom class to save the loaded scenes and a bool for each scene that tells us if the user wants to export such scene or not.
     public class SceneToExport
     {
@@ -68,7 +64,6 @@ public class CustomBuild : EditorWindow
         public SceneToExport[] SelectScenesToExport() 
         {
             ExportScenesWindow.CreateExportScenesWindow(scenes);
-            CustomBuild.continueProcessEvent.Invoke();
             return scenes;
         }
     }
@@ -111,53 +106,26 @@ public class CustomBuild : EditorWindow
             }
             if(GUI.Button(new Rect(460, 370, 60, 20), "Cancel"))
             {
-                CustomBuild.continueBuild = false;
                 this.Close();
             }
 
             if(GUI.Button(new Rect(530, 370, 60, 20), "Confirm"))
             {
-                CustomBuild.continueBuild = true;
+                CustomBuild.AndroidCustomBuild(scenes);
+                UnityEngine.Debug.Log("Finished creating gradle project!");
+                PostUnityBuildStep();
                 this.Close();
             }
+
+            if (BuildPipeline.isBuildingPlayer)
+                GUI.Label(new Rect(5, 95, 590, 40), "building!");
         }
     }
-
-    // public class InspectorWindow : EditorWindow
-    // {
-    //     public static void OpenInspectorWindow()
-    //     {
-    //         var inspectorType = typeof(Editor).Assembly.GetType("UnityEditor.InspectorWindow");
-    //         var inspectorInstance = ScriptableObject.CreateInstance(inspectorType) as EditorWindow;
-    //         inspectorInstance.Show();
-    //     }
-
-    //     void OnGUI()
-    //     {
-    //         GUILayout.Label ("GDG Breakable Object Setup Tool", EditorStyles.boldLabel);
-    //     }
-    // }
 
     [MenuItem("Custom Build/Unix Custom Android Build")]
     public static void UnixCustomAndroidBuild()
     {
-        CustomBuild.continueBuild = false;
-        SceneToExport[] scenes = CustomBuild.getScenesToExport();
-        continueProcessEvent.AddListener(delegate{CustomBuild.AndroidCustomBuild(scenes);});
-
-        if(CustomBuild.continueBuild)
-        {
-            ProcessStartInfo ExportBuildAndRunProcess = new ProcessStartInfo();
-            ExportBuildAndRunProcess.FileName = "/bin/bash";
-            ExportBuildAndRunProcess.Arguments = "-c \"ls -a -l && echo HELLO WORLD\"";
-            ExportBuildAndRunProcess.UseShellExecute = false;
-            ExportBuildAndRunProcess.RedirectStandardOutput = true;
-
-            Process newProcess = Process.Start(ExportBuildAndRunProcess);
-            string strOutput = newProcess.StandardOutput.ReadToEnd();
-            newProcess.WaitForExit();
-            UnityEngine.Debug.Log(strOutput);
-        }
+        CustomBuild.getScenesToExport();
     }
 
     private static SceneToExport[] getScenesToExport() 
@@ -173,7 +141,20 @@ public class CustomBuild : EditorWindow
         androidBuildPlayerOptions.scenes = ExportScenes.GetScenesToString(scenes);
         androidBuildPlayerOptions.locationPathName = "AndroidProject";
         androidBuildPlayerOptions.target = BuildTarget.Android;
-        androidBuildPlayerOptions.options = BuildOptions.None;
+        androidBuildPlayerOptions.options = BuildOptions.AcceptExternalModificationsToPlayer;
         BuildPipeline.BuildPlayer(androidBuildPlayerOptions);
+    }
+
+    private static void PostUnityBuildStep() {
+        ProcessStartInfo ExportBuildAndRunProcess = new ProcessStartInfo();
+        ExportBuildAndRunProcess.FileName = "/bin/bash";
+        ExportBuildAndRunProcess.Arguments = "-c \"ls -a -l && say Unity Part done\"";
+        ExportBuildAndRunProcess.UseShellExecute = false;
+        ExportBuildAndRunProcess.RedirectStandardOutput = true;
+
+        Process newProcess = Process.Start(ExportBuildAndRunProcess);
+        string strOutput = newProcess.StandardOutput.ReadToEnd();
+        newProcess.WaitForExit();
+        UnityEngine.Debug.Log(strOutput);
     }
 }
