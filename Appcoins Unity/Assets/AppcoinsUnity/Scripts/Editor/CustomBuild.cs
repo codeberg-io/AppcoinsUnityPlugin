@@ -94,6 +94,8 @@ public class CustomUnixBuild : CustomBuild
 
     private void UnixBuild(string path)
     {
+        this.VerifyGradlePath();
+
         ProcessStartInfo ExportBuildAndRunProcess = new ProcessStartInfo();
         ExportBuildAndRunProcess.FileName = "/bin/bash";
         ExportBuildAndRunProcess.WorkingDirectory = "/";
@@ -114,6 +116,15 @@ public class CustomUnixBuild : CustomBuild
         newProcess.WaitForExit();
         UnityEngine.Debug.Log(strOutput);
         UnityEngine.Debug.Log("Process exited with code " + newProcess.ExitCode + "\n and errors: " + strError);
+    }
+
+    private void VerifyGradlePath() {
+        string fileName = Path.GetFileName(CustomUnixBuild.gradlePath);
+
+        if(fileName == "gradle")
+        {
+            CustomUnixBuild.gradlePath = Path.GetDirectoryName(CustomUnixBuild.gradlePath) + "/";
+        }
     }
 }
 
