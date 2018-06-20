@@ -19,7 +19,7 @@ public class CustomBuild : EditorWindow {
 
 public class CustomUnixBuild : CustomBuild
 {
-    public static string gradlePath = "";
+    public static string gradlePath = "/Applications/Android\\ Studio.app/Contents/gradle/gradle-4.4/bin/";
     private string ANDROID_STRING = "android";
 
     public static bool androidPartDone = false;
@@ -213,7 +213,7 @@ public class ExportScenes
         {
             if (!BuildPipeline.isBuildingPlayer) {
                 GUI.Label(new Rect(5, 5, 590, 40), "Select the gradle path");
-                CustomUnixBuild.gradlePath = GUI.TextField(new Rect(5, 25, 590, 20), "/Applications/Android\\ Studio.app/Contents/gradle/gradle-4.4/bin/");
+                CustomUnixBuild.gradlePath = GUI.TextField(new Rect(5, 25, 590, 20), CustomUnixBuild.gradlePath);
 
                 GUI.Label(new Rect(5, 45, 590, 40), "Select what scenes you want to export:\n(Only scenes that are in build settings are true by default)");
                 float scrollViewLength = scenes.Length * 25f;
