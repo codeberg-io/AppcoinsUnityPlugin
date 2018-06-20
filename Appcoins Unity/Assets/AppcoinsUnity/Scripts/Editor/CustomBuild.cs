@@ -25,7 +25,7 @@ public class CustomUnixBuild : CustomBuild
     {
         ExportScenes expScenes = new ExportScenes();
         string[] scenesPath = expScenes.GetScenesToString(expScenes.GetScenesToExport());
-        CustomBuild.continueProcessEvent.AddListener(delegate{this.ExportAndBuildCustomBuildTarget("Android", scenesPath);});
+        CustomBuild.continueProcessEvent.AddListener(delegate{this.ExportAndBuildCustomBuildTarget("android", scenesPath);});
     }
 
     private void ExportAndBuildCustomBuildTarget(string target, string[] scenesPath)
@@ -88,17 +88,17 @@ public class CustomUnixBuild : CustomBuild
 
     private void UnixBuild(string path)
     {
-        ProcessStartInfo ExportBuildAndRunProcess = new ProcessStartInfo("/bin/bash");
+        ProcessStartInfo ExportBuildAndRunProcess = new ProcessStartInfo();
         ExportBuildAndRunProcess.FileName = "/bin/bash";
-        ExportBuildAndRunProcess.Arguments = "-c \"cd '"  + (path + "/" + PlayerSettings.productName) + "' && pwd && ls && gradle build\"";
-        ExportBuildAndRunProcess.WorkingDirectory = Path.GetDirectoryName("/bin/bash");
-        ExportBuildAndRunProcess.UseShellExecute = true;
-        ExportBuildAndRunProcess.RedirectStandardOutput = false;
+        ExportBuildAndRunProcess.Arguments = "-c \"cd '/Users/aptoide/Desktop/Appcoins Unity' && gradle build\"";
+        UnityEngine.Debug.Log("/Users/aptoide/Desktop/" + PlayerSettings.productName);
+        ExportBuildAndRunProcess.UseShellExecute = false;
+        ExportBuildAndRunProcess.RedirectStandardOutput = true;
 
         Process newProcess = Process.Start(ExportBuildAndRunProcess);
-        // string strOutput = newProcess.StandardOutput.ReadToEnd();
+        string strOutput = newProcess.StandardOutput.ReadToEnd();
         newProcess.WaitForExit();
-        // UnityEngine.Debug.Log(strOutput);
+        UnityEngine.Debug.Log(strOutput);
     }
 }
 
