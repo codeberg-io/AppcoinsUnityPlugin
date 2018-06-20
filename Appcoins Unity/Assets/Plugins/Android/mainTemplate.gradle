@@ -24,7 +24,7 @@ apply plugin: 'com.android.application'
 
 dependencies {
   compile fileTree(dir: 'libs', include: ['*.jar'])
-  api 'com.asfoundation:appcoins:0.3.1a'
+  api 'com.asfoundation:appcoins:0.3.6'
   compile(name: 'appcoinsunity-release', ext:'aar')
 }
 

@@ -60,8 +60,7 @@ public class CustomUnixBuild : CustomBuild
         this.VerifyIfFolderAlreadyExists(path);
 
         EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Android, BuildTarget.Android);
-        UnityEditor.Build.Reporting.BuildReport error = BuildPipeline.BuildPlayer(scenesPath, path, build_target, build_options);
-        UnityEngine.Debug.Log(error.steps.ToString());
+        BuildPipeline.BuildPlayer(scenesPath, path, build_target, build_options);
         return path;
     }
 
