@@ -19,7 +19,10 @@ public class CustomBuild : EditorWindow {
 
 public class CustomUnixBuild : CustomBuild
 {
+    public static string gradlePath = "";
     private string ANDROID_STRING = "android";
+
+    public static bool androidPartDone = false;
 
     public void UnixCustomAndroidBuild()
     {
@@ -34,8 +37,11 @@ public class CustomUnixBuild : CustomBuild
 
         if(target.ToLower() == ANDROID_STRING)
         {
+            androidPartDone = false;
             path = this.AndroidCustomBuild(scenesPath);
         }
+
+        androidPartDone = true;
 
         if(path != null)
         {
@@ -91,17 +97,23 @@ public class CustomUnixBuild : CustomBuild
         ProcessStartInfo ExportBuildAndRunProcess = new ProcessStartInfo();
         ExportBuildAndRunProcess.FileName = "/bin/bash";
         ExportBuildAndRunProcess.WorkingDirectory = "/";
-        ExportBuildAndRunProcess.Arguments = "-c \"cd '/Users/aptoide/Desktop/Appcoins Unity' && /usr/local/bin/gradle build\"";
+        ExportBuildAndRunProcess.Arguments = "-c \"cd '" + path + "/" + PlayerSettings.productName + "' && " + gradlePath + "gradle build\"";
+
+        UnityEngine.Debug.Log("process args: " + ExportBuildAndRunProcess.Arguments);
+
         UnityEngine.Debug.Log("/Users/aptoide/Desktop/" + PlayerSettings.productName);
         ExportBuildAndRunProcess.UseShellExecute = false;
         ExportBuildAndRunProcess.RedirectStandardOutput = true;
+        ExportBuildAndRunProcess.RedirectStandardError = true;
 
         Process newProcess = Process.Start(ExportBuildAndRunProcess);
         // UnityEngine.Debug.Log(newProcess.Id);
         // UnityEngine.Debug.Log(newProcess.ProcessName);
         string strOutput = newProcess.StandardOutput.ReadToEnd();
+        string strError = newProcess.StandardError.ReadToEnd();
         newProcess.WaitForExit();
         UnityEngine.Debug.Log(strOutput);
+        UnityEngine.Debug.Log("Process exited with code " + newProcess.ExitCode + "\n and errors: " + strError);
     }
 }
 
@@ -199,31 +211,44 @@ public class ExportScenes
         // Display all the scenes, a button to open 'Player Settings, one to cancel and other to confirm(continue).
         void OnGUI()
         {
-            GUI.Label(new Rect(5, 5, 590, 40), "Select what scenes you want to export:\n(Only scenes that are in build settings are true by default)");
-            scrollViewVector = GUI.BeginScrollView (new Rect(5, 30, 590, 330), scrollViewVector, new Rect(0, 0, 1000, 1000));
-            for (int i = 0; i < scenes.Length; i++) 
-            {
-                scenes[i].exportScene = GUI.Toggle(new Rect(10, 10 + i * 20, 100, 20) , scenes[i].exportScene, scenes[i].scene.name);
-            }
-            GUI.EndScrollView();
+            if (!BuildPipeline.isBuildingPlayer) {
+                GUI.Label(new Rect(5, 5, 590, 40), "Select the gradle path");
+                CustomUnixBuild.gradlePath = GUI.TextField(new Rect(5, 25, 590, 20), "/Applications/Android\\ Studio.app/Contents/gradle/gradle-4.4/bin/");
 
-            if(GUI.Button(new Rect(5, 370, 100, 20), "Player Settings"))
-            {
-                EditorApplication.ExecuteMenuItem("Edit/Project Settings/Player");
-            }
-            if(GUI.Button(new Rect(460, 370, 60, 20), "Cancel"))
-            {
-                this.Close();
-            }
+                GUI.Label(new Rect(5, 45, 590, 40), "Select what scenes you want to export:\n(Only scenes that are in build settings are true by default)");
+                float scrollViewLength = scenes.Length * 25f;
+                scrollViewVector = GUI.BeginScrollView(new Rect(5, 70, 590, 330), scrollViewVector, new Rect(0, 0, 590, scrollViewLength));
+                for (int i = 0; i < scenes.Length; i++)
+                {
+                    scenes[i].exportScene = GUI.Toggle(new Rect(10, 10 + i * 20, 100, 20), scenes[i].exportScene, scenes[i].scene.name);
+                }
+                GUI.EndScrollView();
 
-            if(GUI.Button(new Rect(530, 370, 60, 20), "Confirm"))
-            {
-                CustomBuild.continueProcessEvent.Invoke();
-                this.Close();
-            }
+                if (GUI.Button(new Rect(5, 370, 100, 20), "Player Settings"))
+                {
+                    EditorApplication.ExecuteMenuItem("Edit/Project Settings/Player");
+                }
+                //if (GUI.Button(new Rect(105, 370, 100, 20), "Pick Gradle Path"))
+                //{
+                //    EditorUtility.OpenFilePanel("Gradle Path", "", "");
+                //}
+                if (GUI.Button(new Rect(460, 370, 60, 20), "Cancel"))
+                {
+                    this.Close();
+                }
 
-            if (BuildPipeline.isBuildingPlayer)
-                GUI.Label(new Rect(5, 95, 590, 40), "building!");
+                if (CustomUnixBuild.gradlePath != "" && GUI.Button(new Rect(530, 370, 60, 20), "Confirm"))
+                {
+                    CustomBuild.continueProcessEvent.Invoke();
+                    this.Close();
+                }
+            } else {
+                if (!CustomUnixBuild.androidPartDone)
+                    GUI.Label(new Rect(5, 30, 590, 40), "building gradle project...");
+                else
+                    GUI.Label(new Rect(5, 30, 590, 40), "Running gradle to generate APK...");
+            }
+                
         }
     }
 }
