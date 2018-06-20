@@ -17,6 +17,6 @@ public class UnityActivity extends UnityPlayerActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         UnityAppcoins.instance.onActivityResult(requestCode, resultCode, data);
-        Log.d("onActivityResultOd", "Function called.");
+        Log.d("UnityActivity", "onActivityResult called");
     }
 }

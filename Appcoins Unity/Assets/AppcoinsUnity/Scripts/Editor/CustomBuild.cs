@@ -218,6 +218,9 @@ public class ExportScenes
                 CustomBuild.continueProcessEvent.Invoke();
                 this.Close();
             }
+
+            if (BuildPipeline.isBuildingPlayer)
+                GUI.Label(new Rect(5, 95, 590, 40), "building!");
         }
     }
 }

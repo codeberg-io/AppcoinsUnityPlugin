@@ -3,6 +3,7 @@ package com.aptoide.appcoinsunity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.asf.appcoins.sdk.iab.payment.PaymentStatus;
 import com.unity3d.player.UnityPlayer;
@@ -76,10 +77,16 @@ public class UnityAppcoins extends Fragment {
                             // Now we tell the sdk to consume the skuId.
                             Application.appCoinsSdk.consume(skuId);
                             // Purchase successfully done. Release the prize.
+
+                            Log.d("UnityActivity", "AppcoinsUnity::purchaseSuccess! skuid " + skuId);
+
                             UnityPlayer.UnitySendMessage("AppcoinsUnity","purchaseSuccess",skuId);
                         }
                         else{
                             String skuId = paymentDetails.getSkuId();
+
+                            Log.d("UnityActivity", "AppcoinsUnity::purchaseFailure! skuid " + skuId);
+
                             UnityPlayer.UnitySendMessage("AppcoinsUnity","purchaseFailure",skuId);
                         }
                     }));
