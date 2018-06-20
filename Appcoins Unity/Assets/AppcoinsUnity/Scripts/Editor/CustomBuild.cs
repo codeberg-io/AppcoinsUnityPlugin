@@ -98,7 +98,9 @@ public class CustomUnixBuild : CustomBuild
         ProcessStartInfo ExportBuildAndRunProcess = new ProcessStartInfo();
         ExportBuildAndRunProcess.FileName = "/bin/bash";
         ExportBuildAndRunProcess.WorkingDirectory = "/";
-        ExportBuildAndRunProcess.Arguments = "-c \"cd '" + path + "/" + PlayerSettings.productName + "' && " + gradlePath + "gradle build\"";
+        ExportBuildAndRunProcess.Arguments = "-c \"cd '" + path + "/" + PlayerSettings.productName + "' && " +
+                                                gradlePath + "gradle build && " +
+                                                "/usr/local/bin/adb install -r './build/outputs/apk/release/" + PlayerSettings.productName + "-release.apk'\"";
 
         UnityEngine.Debug.Log("process args: " + ExportBuildAndRunProcess.Arguments);
 

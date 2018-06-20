@@ -26,7 +26,7 @@ android {
 
 dependencies {
     provided files('./libs/UnityPlayer.jar')
-    api 'com.asfoundation:appcoins:0.3.5'
+    api 'com.asfoundation:appcoins:0.3.6a'
 }
 
 task copyAarToUnity {
