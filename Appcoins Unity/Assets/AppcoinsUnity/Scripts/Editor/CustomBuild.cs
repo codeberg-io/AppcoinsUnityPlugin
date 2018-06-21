@@ -3,7 +3,6 @@ using UnityEngine;
 using UnityEngine.Events;
 using System;
 using System.IO;
-using System.Diagnostics;
 using System.Collections;
 
 public class CustomBuild : EditorWindow {
@@ -15,11 +14,27 @@ public class CustomBuild : EditorWindow {
         CustomUnixBuild unixBuild = new CustomUnixBuild();
         unixBuild.UnixCustomAndroidBuild();
     }
+
+    [MenuItem("Custom Build/ADB Install")]
+    public static void CallADBInstall()
+    {
+        string pathEnv = System.Environment.GetEnvironmentVariable("path");
+        Debug.Log("PathEnv " + pathEnv);
+
+        CustomUnixBuild unixBuild = new CustomUnixBuild();
+
+        string path = Application.dataPath + "/../Android";
+        Debug.Log("Application.dataPath is " + path);
+
+        unixBuild.AdbInstall(path);
+    }
 }
 
 public class CustomUnixBuild : CustomBuild
 {
     public static string gradlePath = "/Applications/Android\\ Studio.app/Contents/gradle/gradle-4.4/bin/";
+    public static string adbPath = "$(ANDROID_HOME)/platform-tools/adb";
+    public static bool runAdbInstall = false;
     private string ANDROID_STRING = "android";
 
     public static bool androidPartDone = false;
@@ -45,7 +60,8 @@ public class CustomUnixBuild : CustomBuild
 
         if(path != null)
         {
-            this.UnixBuild(path);
+            UnixBuild(path);
+            AdbInstall(path);
         }
     }
 
@@ -91,41 +107,32 @@ public class CustomUnixBuild : CustomBuild
         }
     }
 
-    private void UnixBuild(string path)
+    private void VerifyGradlePath()
     {
-        this.VerifyGradlePath();
-
-        ProcessStartInfo ExportBuildAndRunProcess = new ProcessStartInfo();
-        ExportBuildAndRunProcess.FileName = "/bin/bash";
-        ExportBuildAndRunProcess.WorkingDirectory = "/";
-        ExportBuildAndRunProcess.Arguments = "-c \"cd '" + path + "/" + PlayerSettings.productName + "' && " +
-                                                gradlePath + "gradle build && " +
-                                                "/usr/local/bin/adb install -r './build/outputs/apk/release/" + PlayerSettings.productName + "-release.apk'\"";
-
-        UnityEngine.Debug.Log("process args: " + ExportBuildAndRunProcess.Arguments);
-
-        UnityEngine.Debug.Log("/Users/aptoide/Desktop/" + PlayerSettings.productName);
-        ExportBuildAndRunProcess.UseShellExecute = false;
-        ExportBuildAndRunProcess.RedirectStandardOutput = true;
-        ExportBuildAndRunProcess.RedirectStandardError = true;
-
-        Process newProcess = Process.Start(ExportBuildAndRunProcess);
-        // UnityEngine.Debug.Log(newProcess.Id);
-        // UnityEngine.Debug.Log(newProcess.ProcessName);
-        string strOutput = newProcess.StandardOutput.ReadToEnd();
-        string strError = newProcess.StandardError.ReadToEnd();
-        newProcess.WaitForExit();
-        UnityEngine.Debug.Log(strOutput);
-        UnityEngine.Debug.Log("Process exited with code " + newProcess.ExitCode + "\n and errors: " + strError);
-    }
-
-    private void VerifyGradlePath() {
         string fileName = Path.GetFileName(CustomUnixBuild.gradlePath);
 
-        if(fileName == "gradle")
+        if (fileName == "gradle")
         {
             CustomUnixBuild.gradlePath = Path.GetDirectoryName(CustomUnixBuild.gradlePath) + "/";
         }
+    }
+
+    public void UnixBuild(string path)
+    {
+        this.VerifyGradlePath();
+
+        string gradleCmd = gradlePath + "gradle build";
+        string cmdPath = path + "/" + PlayerSettings.productName;
+
+        BashUtils.RunBashCommandInPath(gradleCmd, cmdPath);
+    }
+
+    public void AdbInstall(string path)
+    {
+        string adbCmd = CustomUnixBuild.adbPath + " install -r './build/outputs/apk/release/" + PlayerSettings.productName + "-release.apk'";
+        string cmdPath = path + "/" + PlayerSettings.productName;
+
+        BashUtils.RunBashCommandInPath(adbCmd, cmdPath);
     }
 }
 
@@ -224,12 +231,23 @@ public class ExportScenes
         void OnGUI()
         {
             if (!BuildPipeline.isBuildingPlayer) {
-                GUI.Label(new Rect(5, 5, 590, 40), "Select the gradle path");
-                CustomUnixBuild.gradlePath = GUI.TextField(new Rect(5, 25, 590, 20), CustomUnixBuild.gradlePath);
+                float gradlePartHeight = 5;
+                GUI.Label(new Rect(5, gradlePartHeight, 590, 40), "Select the gradle path");
+                gradlePartHeight += 20;
+                CustomUnixBuild.gradlePath = GUI.TextField(new Rect(5, gradlePartHeight, 590, 20), CustomUnixBuild.gradlePath);
 
-                GUI.Label(new Rect(5, 45, 590, 40), "Select what scenes you want to export:\n(Only scenes that are in build settings are true by default)");
+                float adbPartHeight = gradlePartHeight + 20;
+                GUI.Label(new Rect(5, adbPartHeight, 590, 40), "Select the adb path");
+                adbPartHeight += 20;
+                CustomUnixBuild.adbPath = GUI.TextField(new Rect(5, adbPartHeight, 590, 20), CustomUnixBuild.adbPath);
+                adbPartHeight += 20;
+                CustomUnixBuild.runAdbInstall = GUI.Toggle(new Rect(5, adbPartHeight, 590, 20), CustomUnixBuild.runAdbInstall, "Install build when done?");
+
+                float scenesPartHeight = adbPartHeight + 20;
+                GUI.Label(new Rect(5, scenesPartHeight, 590, 40), "Select what scenes you want to export:\n(Only scenes that are in build settings are true by default)");
                 float scrollViewLength = scenes.Length * 25f;
-                scrollViewVector = GUI.BeginScrollView(new Rect(5, 70, 590, 330), scrollViewVector, new Rect(0, 0, 590, scrollViewLength));
+                scenesPartHeight += 25;
+                scrollViewVector = GUI.BeginScrollView(new Rect(5, scenesPartHeight, 590, 330), scrollViewVector, new Rect(0, 0, 590, scrollViewLength));
                 for (int i = 0; i < scenes.Length; i++)
                 {
                     scenes[i].exportScene = GUI.Toggle(new Rect(10, 10 + i * 20, 100, 20), scenes[i].exportScene, scenes[i].scene.name);
@@ -240,10 +258,6 @@ public class ExportScenes
                 {
                     EditorApplication.ExecuteMenuItem("Edit/Project Settings/Player");
                 }
-                //if (GUI.Button(new Rect(105, 370, 100, 20), "Pick Gradle Path"))
-                //{
-                //    EditorUtility.OpenFilePanel("Gradle Path", "", "");
-                //}
                 if (GUI.Button(new Rect(460, 370, 60, 20), "Cancel"))
                 {
                     this.Close();
