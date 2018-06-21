@@ -18,13 +18,10 @@ public class CustomBuild : EditorWindow {
     [MenuItem("Custom Build/ADB Install")]
     public static void CallADBInstall()
     {
-        string pathEnv = System.Environment.GetEnvironmentVariable("path");
-        Debug.Log("PathEnv " + pathEnv);
-
         CustomUnixBuild unixBuild = new CustomUnixBuild();
 
         string path = Application.dataPath + "/../Android";
-        Debug.Log("Application.dataPath is " + path);
+        // Debug.Log("Application.dataPath is " + path);
 
         unixBuild.AdbInstall(path);
     }
@@ -33,7 +30,7 @@ public class CustomBuild : EditorWindow {
 public class CustomUnixBuild : CustomBuild
 {
     public static string gradlePath = "/Applications/Android\\ Studio.app/Contents/gradle/gradle-4.4/bin/";
-    public static string adbPath = "$(ANDROID_HOME)/platform-tools/adb";
+    public static string adbPath = EditorPrefs.GetString("AndroidSdkRoot") + "/platform-tools/adb";
     public static bool runAdbInstall = false;
     private string ANDROID_STRING = "android";
 
@@ -42,7 +39,7 @@ public class CustomUnixBuild : CustomBuild
     public void UnixCustomAndroidBuild()
     {
         ExportScenes expScenes = new ExportScenes();
-        string[] scenesPath = expScenes.GetScenesToString(expScenes.AllScenesToExport());
+        string[] scenesPath = expScenes.ScenesToString(expScenes.AllScenesToExport());
         CustomBuild.continueProcessEvent.AddListener(delegate{this.ExportAndBuildCustomBuildTarget("android", scenesPath);});
     }
 
@@ -159,7 +156,7 @@ public class ExportScenes
 {
     private SceneToExport[] scenes;
 
-    public string[] GetScenesToString(SceneToExport[] scenes) 
+    public string[] ScenesToString(SceneToExport[] scenes) 
     {
         ArrayList pathScenes = new ArrayList();
 
@@ -266,15 +263,13 @@ public class ExportScenes
                 if (CustomUnixBuild.gradlePath != "" && GUI.Button(new Rect(530, 370, 60, 20), "Confirm"))
                 {
                     CustomBuild.continueProcessEvent.Invoke();
-                    this.Close();
                 }
             } else {
                 if (!CustomUnixBuild.androidPartDone)
                     GUI.Label(new Rect(5, 30, 590, 40), "building gradle project...");
                 else
                     GUI.Label(new Rect(5, 30, 590, 40), "Running gradle to generate APK...");
-            }
-                
+            }  
         }
     }
 }
