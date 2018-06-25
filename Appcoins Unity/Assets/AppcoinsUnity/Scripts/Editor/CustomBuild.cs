@@ -55,18 +55,33 @@ public class CustomBuild : EditorWindow {
 
 public class CustomUnixBuild : CustomBuild
 {
+
+    public enum BuildStage
+    {
+        IDLE,
+        UNITY_BUILD,
+        GRADLE_BUILD,
+        ADB_INSTALL,
+        ADB_RUN,
+        DONE,
+    }
+
     public static string gradlePath = "/Applications/Android\\ Studio.app/Contents/gradle/gradle-4.4/bin/";
     public static string adbPath = EditorPrefs.GetString("AndroidSdkRoot") + "/platform-tools/adb";
     public static bool runAdbInstall = false;
+    public static BuildStage stage;
     private string ANDROID_STRING = "android";
 
-    public static bool androidPartDone = false;
 
     public void UnixCustomAndroidBuild()
     {
         ExportScenes expScenes = new ExportScenes();
         string[] scenesPath = expScenes.ScenesToString(expScenes.AllScenesToExport());
-        CustomBuild.continueProcessEvent.AddListener(delegate{this.ExportAndBuildCustomBuildTarget("android", scenesPath);});
+        CustomBuild.continueProcessEvent.AddListener(
+            delegate{
+            this.ExportAndBuildCustomBuildTarget("android", scenesPath);
+            }
+        );
     }
 
     private void ExportAndBuildCustomBuildTarget(string target, string[] scenesPath)
@@ -75,21 +90,23 @@ public class CustomUnixBuild : CustomBuild
 
         if(target.ToLower() == ANDROID_STRING)
         {
-            androidPartDone = false;
+            stage = BuildStage.UNITY_BUILD;
             path = this.AndroidCustomBuild(scenesPath);
         }
 
-        androidPartDone = true;
-
         if(path != null)
         {
+            stage = BuildStage.GRADLE_BUILD;
             UnixBuild(path);
             
             if(CustomUnixBuild.runAdbInstall)
             {
+                stage = BuildStage.ADB_INSTALL;
                 AdbInstall(path);
             }
         }
+
+        stage = BuildStage.DONE;
     }
 
     private string AndroidCustomBuild(string[] scenesPath)
@@ -259,50 +276,66 @@ public class ExportScenes
         // Display all the scenes, a button to open 'Player Settings, one to cancel and other to confirm(continue).
         void OnGUI()
         {
-            if (!BuildPipeline.isBuildingPlayer) {
-                float gradlePartHeight = 5;
-                GUI.Label(new Rect(5, gradlePartHeight, 590, 40), "Select the gradle path");
-                gradlePartHeight += 20;
-                CustomUnixBuild.gradlePath = GUI.TextField(new Rect(5, gradlePartHeight, 590, 20), CustomUnixBuild.gradlePath);
-
-                float adbPartHeight = gradlePartHeight + 20;
-                GUI.Label(new Rect(5, adbPartHeight, 590, 40), "Select the adb path");
-                adbPartHeight += 20;
-                CustomUnixBuild.adbPath = GUI.TextField(new Rect(5, adbPartHeight, 590, 20), CustomUnixBuild.adbPath);
-                adbPartHeight += 20;
-                CustomUnixBuild.runAdbInstall = GUI.Toggle(new Rect(5, adbPartHeight, 590, 20), CustomUnixBuild.runAdbInstall, "Install build when done?");
-
-                float scenesPartHeight = adbPartHeight + 20;
-                GUI.Label(new Rect(5, scenesPartHeight, 590, 40), "Select what scenes you want to export:\n(Only scenes that are in build settings are true by default)");
-                float scrollViewLength = scenes.Length * 25f;
-                scenesPartHeight += 25;
-                scrollViewVector = GUI.BeginScrollView(new Rect(5, scenesPartHeight, 590, 330), scrollViewVector, new Rect(0, 0, 590, scrollViewLength));
-                for (int i = 0; i < scenes.Length; i++)
-                {
-                    scenes[i].exportScene = GUI.Toggle(new Rect(10, 10 + i * 20, 100, 20), scenes[i].exportScene, scenes[i].scene.name);
-                }
-                GUI.EndScrollView();
-
-                if (GUI.Button(new Rect(5, 370, 100, 20), "Player Settings"))
-                {
-                    EditorApplication.ExecuteMenuItem("Edit/Project Settings/Player");
-                }
-                if (GUI.Button(new Rect(460, 370, 60, 20), "Cancel"))
-                {
-                    this.Close();
-                }
-
-                if (CustomUnixBuild.gradlePath != "" && GUI.Button(new Rect(530, 370, 60, 20), "Confirm"))
-                {
-                    CustomBuild.continueProcessEvent.Invoke();
-                    this.Close();
-                }
-            } else {
-                if (!CustomUnixBuild.androidPartDone)
+            switch(CustomUnixBuild.stage) {
+                case CustomUnixBuild.BuildStage.IDLE:
+                    CreateCustomBuildUI();
+                    break;
+                case CustomUnixBuild.BuildStage.UNITY_BUILD:
                     GUI.Label(new Rect(5, 30, 590, 40), "building gradle project...");
-                else
+                    break;
+                case CustomUnixBuild.BuildStage.GRADLE_BUILD:
                     GUI.Label(new Rect(5, 30, 590, 40), "Running gradle to generate APK...");
-            }  
+                    break;
+                case CustomUnixBuild.BuildStage.ADB_INSTALL:
+                    GUI.Label(new Rect(5, 30, 590, 40), "Installing APK...");
+                    break;
+                case CustomUnixBuild.BuildStage.ADB_RUN:
+                    GUI.Label(new Rect(5, 30, 590, 40), "Running APK...");
+                    break;
+                case CustomUnixBuild.BuildStage.DONE:
+                    this.Close();
+                    break;
+            }
+        }
+
+        void CreateCustomBuildUI() {
+            float gradlePartHeight = 5;
+            GUI.Label(new Rect(5, gradlePartHeight, 590, 40), "Select the gradle path");
+            gradlePartHeight += 20;
+            CustomUnixBuild.gradlePath = GUI.TextField(new Rect(5, gradlePartHeight, 590, 20), CustomUnixBuild.gradlePath);
+
+            float adbPartHeight = gradlePartHeight + 20;
+            GUI.Label(new Rect(5, adbPartHeight, 590, 40), "Select the adb path");
+            adbPartHeight += 20;
+            CustomUnixBuild.adbPath = GUI.TextField(new Rect(5, adbPartHeight, 590, 20), CustomUnixBuild.adbPath);
+            adbPartHeight += 20;
+            CustomUnixBuild.runAdbInstall = GUI.Toggle(new Rect(5, adbPartHeight, 590, 20), CustomUnixBuild.runAdbInstall, "Install build when done?");
+
+            float scenesPartHeight = adbPartHeight + 20;
+            GUI.Label(new Rect(5, scenesPartHeight, 590, 40), "Select what scenes you want to export:\n(Only scenes that are in build settings are true by default)");
+            float scrollViewLength = scenes.Length * 25f;
+            scenesPartHeight += 25;
+            scrollViewVector = GUI.BeginScrollView(new Rect(5, scenesPartHeight, 590, 330), scrollViewVector, new Rect(0, 0, 590, scrollViewLength));
+            for (int i = 0; i < scenes.Length; i++)
+            {
+                scenes[i].exportScene = GUI.Toggle(new Rect(10, 10 + i * 20, 100, 20), scenes[i].exportScene, scenes[i].scene.name);
+            }
+            GUI.EndScrollView();
+
+            if (GUI.Button(new Rect(5, 370, 100, 20), "Player Settings"))
+            {
+                EditorApplication.ExecuteMenuItem("Edit/Project Settings/Player");
+            }
+            if (GUI.Button(new Rect(460, 370, 60, 20), "Cancel"))
+            {
+                this.Close();
+            }
+
+            if (CustomUnixBuild.gradlePath != "" && GUI.Button(new Rect(530, 370, 60, 20), "Confirm"))
+            {
+                CustomBuild.continueProcessEvent.Invoke();
+                this.Close();
+            }
         }
     }
 }

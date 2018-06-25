@@ -33,6 +33,7 @@ android {
   buildToolsVersion '27.0.3'
 
   defaultConfig {
+    applicationId '**APPLICATIONID**'
     minSdkVersion 21
     targetSdkVersion 27
     ndk {

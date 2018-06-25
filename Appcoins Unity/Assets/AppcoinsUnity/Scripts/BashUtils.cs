@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEditor;
 
 public class BashUtils {
-    private static Thread runBash;
+	private static Thread runBash;
     private static StringBuilder procOutput = null;
 
     public static void RunBashCommandInPath(string cmd, string path)
@@ -53,14 +53,15 @@ public class BashUtils {
     //     ProcessStartInfo processInfo = new ProcessStartInfo();
     //     processInfo.FileName = "/bin/bash";
     //     processInfo.WorkingDirectory = "/";
-    //     processInfo.Arguments = "-c \"open -n /Applications/Utilities/Terminal.app --args /Users/aptoide/Desktop/bash.sh\"";
+	//     processInfo.Arguments = "-c \"open -n /Applications/Utilities/Terminal.app --args /Users/aptoide/Desktop/bash.sh\"";
 
     //     processInfo.UseShellExecute = false;
 
-    //     Process newProcess = new Process();   
-    //     newProcess.StartInfo = processInfo;
-    //     newProcess.Start();
+	//     Process newProcess = new Process();   
+	//     newProcess.StartInfo = processInfo;
+	//     newProcess.Start();
     //     newProcess.WaitForExit();
+
     // }
 
     public static void RunBashCommand(string cmd)

@@ -37,22 +37,22 @@ public class Application extends android.app.Application {
         setupStoreEnvironment();
 
         setupAdsSDK();
-        Log.d("UnityActivity", "Aplication began.");
+        Log.d("AppcoinsUnityPlugin", "Aplication began.");
     }
 
     public void setupStoreEnvironment() {
         final boolean debugValue = getResources().getBoolean(R.bool.APPCOINS_ENABLE_DEBUG);
-        Log.d("UnityActivity", "Debug should be " + debugValue);
+        Log.d("AppcoinsUnityPlugin", "Debug should be " + debugValue);
 
         debugFlag = debugValue;
     }
 
     public void setupAdsSDK() {
         final boolean poaValue = getResources().getBoolean(R.bool.APPCOINS_ENABLE_POA);
-        Log.d("UnityActivity", "POA should be " + poaValue);
+        Log.d("AppcoinsUnityPlugin", "POA should be " + poaValue);
         if(poaValue == true) {
 
-            Log.d("UnityActivity", "POA sdk initialized");
+            Log.d("AppcoinsUnityPlugin", "POA sdk initialized");
             adsSdk = new AppCoinsAdsBuilder().withDebug(debugFlag)
                     .createAdvertisementSdk(application);
             adsSdk.init(application);
@@ -60,10 +60,10 @@ public class Application extends android.app.Application {
     }
 
     public static void setupSDK(String developerAddress){
-        Log.d("UnityActivity", "Set up SDK began.");
+        Log.d("AppcoinsUnityPlugin", "Set up SDK began.");
 
         if(IABFlag) {
-            Log.d("UnityActivity", "IAB sdk initialized");
+            Log.d("AppcoinsUnityPlugin", "IAB sdk initialized");
             appCoinsSdk = new AppCoinsIabBuilder(developerAddress).withSkus(buildSkus())
                     .withDebug(debugFlag)
                     .createAppCoinsIab();
