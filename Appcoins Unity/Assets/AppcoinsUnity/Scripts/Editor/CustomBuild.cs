@@ -295,6 +295,7 @@ public class ExportScenes
                 if (CustomUnixBuild.gradlePath != "" && GUI.Button(new Rect(530, 370, 60, 20), "Confirm"))
                 {
                     CustomBuild.continueProcessEvent.Invoke();
+                    this.Close();
                 }
             } else {
                 if (!CustomUnixBuild.androidPartDone)
