@@ -4,6 +4,10 @@ using UnityEngine.Events;
 using System;
 using System.IO;
 using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Text;
+using System.Threading;
 
 public class CustomBuild : EditorWindow {
     internal static UnityEvent continueProcessEvent = new UnityEvent();
@@ -15,16 +19,38 @@ public class CustomBuild : EditorWindow {
         unixBuild.UnixCustomAndroidBuild();
     }
 
-    [MenuItem("Custom Build/ADB Install")]
-    public static void CallADBInstall()
-    {
-        CustomUnixBuild unixBuild = new CustomUnixBuild();
+    // [MenuItem("Custom Build/ADB Install")]
+    // public static void CallADBInstall()
+    // {
+    //     CustomUnixBuild unixBuild = new CustomUnixBuild();
 
-        string path = Application.dataPath + "/../Android";
-        // Debug.Log("Application.dataPath is " + path);
+    //     string path = Application.dataPath + "/../Android";
+    //     // Debug.Log("Application.dataPath is " + path);
 
-        unixBuild.AdbInstall(path);
-    }
+    //     unixBuild.AdbInstall(path);
+    // }
+
+    // [MenuItem("Custom Build/Terminal")]
+    // public static void Terminal()
+    // {
+    //     Process newProcess = new Process();
+    //     newProcess.StartInfo.FileName = "/bin/bash";
+    //     newProcess.StartInfo.WorkingDirectory = "/";
+    //     // newProcess.StartInfo.Arguments = "-c \"say hello\"";
+    //     newProcess.StartInfo.UseShellExecute = false;
+    //     newProcess.StartInfo.RedirectStandardInput = true;
+    //     newProcess.StartInfo.RedirectStandardOutput = true;
+    //     newProcess.StartInfo.ErrorDialog = false;
+
+    //     newProcess.Start();
+    //     StreamWriter sWriter = newProcess.StandardInput;
+    //     sWriter.WriteLine("say hello");
+    //     sWriter.WriteLine("exit");
+    //     newProcess.StandardInput.Flush();
+    //     newProcess.StandardInput.Close();
+    //     // string out = newProcess.StandardOutput.ReadToEnd();
+    //     newProcess.WaitForExit();
+    // }
 }
 
 public class CustomUnixBuild : CustomBuild
@@ -58,7 +84,11 @@ public class CustomUnixBuild : CustomBuild
         if(path != null)
         {
             UnixBuild(path);
-            AdbInstall(path);
+            
+            if(CustomUnixBuild.runAdbInstall)
+            {
+                AdbInstall(path);
+            }
         }
     }
 
@@ -121,6 +151,7 @@ public class CustomUnixBuild : CustomBuild
         string gradleCmd = gradlePath + "gradle build";
         string cmdPath = path + "/" + PlayerSettings.productName;
 
+        // BashUtils.RunBashCommandInPath(gradleCmd, cmdPath);
         BashUtils.RunBashCommandInPath(gradleCmd, cmdPath);
     }
 
@@ -129,6 +160,7 @@ public class CustomUnixBuild : CustomBuild
         string adbCmd = CustomUnixBuild.adbPath + " install -r './build/outputs/apk/release/" + PlayerSettings.productName + "-release.apk'";
         string cmdPath = path + "/" + PlayerSettings.productName;
 
+        // BashUtils.RunBashCommandInPath(adbCmd, cmdPath);
         BashUtils.RunBashCommandInPath(adbCmd, cmdPath);
     }
 }
