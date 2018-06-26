@@ -15,27 +15,8 @@ public class CustomBuildMenuItem : EditorWindow {
     [MenuItem("Custom Build/Custom Android Build")]
     public static void CallAndroidCustomBuild()
     {
-        CustomBuild buildObj = null;
-
-        if(SystemInfo.operatingSystemFamily == OperatingSystemFamily.MacOSX ||
-            SystemInfo.operatingSystemFamily == OperatingSystemFamily.Linux)
-        {
-            buildObj = new UnixCustomBuild();
-        }
-
-        else if(SystemInfo.operatingSystemFamily == OperatingSystemFamily.Windows)
-        {
-            buildObj = new WindowsCustomBuild();
-        }
-
-        if(buildObj)
-        {
-            buildObj.ExecuteCustomBuild("android");
-        }
-
-        else {
-            UnityEngine.Debug.Log("Run Unity on a desktop OS");
-        }
+        CustomBuild buildObj = new CustomBuild();
+        buildObj.ExecuteCustomBuild("android");
     }
 
     // [MenuItem("Custom Build/ADB Install")]
@@ -93,17 +74,44 @@ public class CustomBuild
     protected string ANDROID_STRING = "android";
     protected string BASH_LOCATION = "/bin/bash";
     protected string CMD_LOCATION = "cmd.exe";
+    private string TERMINAL_CHOOSED = null;
+
+    public CustomBuild()
+    {
+        if(SystemInfo.operatingSystemFamily == OperatingSystemFamily.MacOSX ||
+            SystemInfo.operatingSystemFamily == OperatingSystemFamily.Linux)
+        {
+            TERMINAL_CHOOSED = BASH_LOCATION;
+        }
+
+        else if(SystemInfo.operatingSystemFamily == OperatingSystemFamily.Windows)
+        {
+            TERMINAL_CHOOSED = CMD_LOCATION;
+        }
+
+        else {
+            UnityEngine.Debug.Error("Run Unity on a desktop OS");
+        }
+    }
 
     public void ExecuteCustomBuild(string target)
     {
-        ExportScenes expScenes = new ExportScenes();
-        string[] scenesPath = expScenes.ScenesToString(expScenes.AllScenesToExport());
-        CustomBuildMenuItem.continueProcessEvent.AddListener(
-            delegate 
-            {
-                this.ExportAndBuildCustomBuildTarget(target, scenesPath);
-            }
-        );
+        if(TERMINAL_CHOOSED != null)
+        {
+            ExportScenes expScenes = new ExportScenes();
+            string[] scenesPath = expScenes.ScenesToString(expScenes.AllScenesToExport());
+            CustomBuildMenuItem.continueProcessEvent.AddListener(
+                delegate 
+                {
+                    this.ExportAndBuildCustomBuildTarget(target, scenesPath);
+                }
+            );
+        }
+
+        else
+        {
+            return;
+        }
     }
 
     protected void ExportAndBuildCustomBuildTarget(string target, string[] scenesPath)
@@ -208,32 +216,6 @@ public class CustomBuild
         string cmdPath = path + "/" + PlayerSettings.productName;
 
         BashUtils.RunCommandInPath(BASH_LOCATION, adbCmd, cmdPath);
-    }
-}
-
-public class UnixCustomBuild : CustomBuild
-{
-    public void Build(string path)
-    {
-        base.Build(BASH_LOCATION, path);
-    }
-
-    public void AdbInstall(string path)
-    {
-        base.AdbInstall(BASH_LOCATION, path);
-    }
-}
-
-public class WindowsCustomBuild : CustomBuild
-{
-    public void Build(string path)
-    {
-        base.Build(CMD_LOCATION, path);
-    }
-
-    public void AdbInstall(string path)
-    {
-        base.AdbInstall(CMD_LOCATION, path);
     }
 }
 
