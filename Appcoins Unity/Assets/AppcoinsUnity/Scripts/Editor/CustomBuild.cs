@@ -15,7 +15,7 @@ public class CustomBuildMenuItem : EditorWindow {
     [MenuItem("Custom Build/Custom Android Build")]
     public static void CallAndroidCustomBuild()
     {
-        CustomBuild buildObj;
+        CustomBuild buildObj = null;
 
         if(SystemInfo.operatingSystemFamily == OperatingSystemFamily.MacOSX ||
             SystemInfo.operatingSystemFamily == OperatingSystemFamily.Linux)
@@ -28,7 +28,14 @@ public class CustomBuildMenuItem : EditorWindow {
             buildObj = new WindowsCustomBuild();
         }
 
-        buildObj.ExecuteCustomBuild("android");
+        if(buildObj)
+        {
+            buildObj.ExecuteCustomBuild("android");
+        }
+
+        else {
+            UnityEngine.Debug.Log("Run Unity on a desktop OS");
+        }
     }
 
     // [MenuItem("Custom Build/ADB Install")]
