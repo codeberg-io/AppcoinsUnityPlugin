@@ -11,13 +11,13 @@ public class BashUtils {
 	private static Thread runBash;
     private static StringBuilder procOutput = null;
 
-    public static void RunBashCommandInPath(string cmd, string path)
+    public static void RunCommandInPath(string terminalPath, string cmd, string path)
     {
         UnityEngine.Debug.Log("Cmd is " + cmd);
         UnityEngine.Debug.Log("Path is " + path);
 
         ProcessStartInfo processInfo = new ProcessStartInfo();
-        processInfo.FileName = "/bin/bash";
+        processInfo.FileName = terminalPath;
         processInfo.WorkingDirectory = "/";
 
         if (path != "")
@@ -64,8 +64,8 @@ public class BashUtils {
 
     // }
 
-    public static void RunBashCommand(string cmd)
+    public static void RunBashCommand(string terminalPath, string cmd)
     {
-        RunBashCommandInPath(cmd, "");
+        RunCommandInPath(terminalPath, cmd, "");
     }
 }
