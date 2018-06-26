@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
-public class UnityActivity extends UnityPlayerActivity {
+public class AppcoinsActivity extends UnityPlayerActivity {
     protected void onCreate(Bundle savedInstanceState) {
         // call UnityPlayerActivity.onCreate()
         super.onCreate(savedInstanceState);
