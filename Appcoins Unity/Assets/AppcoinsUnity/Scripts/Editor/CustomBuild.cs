@@ -226,12 +226,12 @@ public class UnixCustomBuild : CustomBuild
 
 public class WindowsCustomBuild : CustomBuild
 {
-    public override void Build(string path)
+    public void Build(string path)
     {
         base.Build(CMD_LOCATION, path);
     }
 
-    public override void AdbInstall(string path)
+    public void AdbInstall(string path)
     {
         base.AdbInstall(CMD_LOCATION, path);
     }
