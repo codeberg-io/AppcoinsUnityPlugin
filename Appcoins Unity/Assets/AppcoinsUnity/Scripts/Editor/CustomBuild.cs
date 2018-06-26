@@ -65,7 +65,7 @@ public class CustomBuild
         DONE,
     }
 
-    public static string gradlePath = "/Applications/Android\\ Studio.app/Contents/gradle/gradle-4.4/bin/";
+    public static string gradlePath = "/Applications/Android Studio.app/Contents/gradle/gradle-4.4/bin/";
     public static string adbPath = EditorPrefs.GetString("AndroidSdkRoot") + "/platform-tools/adb";
     public static bool runAdbInstall = false;
     public static BuildStage stage;
@@ -198,23 +198,23 @@ public class CustomBuild
     protected void Build(string path) 
     {
         this.CheckAppPath(ref CustomBuild.gradlePath, "gradle");
-        UnityEngine.Debug.Log(CustomBuild.gradlePath);
 
-        string gradleCmd = gradlePath + "gradle build";
-        string cmdPath = path + "/" + PlayerSettings.productName;
+        string gradleCmd = "'" + gradlePath + "gradle' build";
+        string cmdPath = "'" + path + "/" + PlayerSettings.productName + "'";
 
         BashUtils.RunCommandInPath(TERMINAL_CHOOSED, gradleCmd, cmdPath);
+        // BashUtils.RunCommandWithGUI(gradleCmd, cmdPath);
     }
 
     protected void AdbInstall(string path) 
     {
         this.CheckAppPath(ref CustomBuild.adbPath, "adb");
-        UnityEngine.Debug.Log(CustomBuild.adbPath);
 
-        string adbCmd = CustomBuild.adbPath + "adb install -r './build/outputs/apk/release/" + PlayerSettings.productName + "-release.apk'";
-        string cmdPath = path + "/" + PlayerSettings.productName;
+        string adbCmd = "'" + CustomBuild.adbPath + "adb' install -r './build/outputs/apk/release/" + PlayerSettings.productName + "-release.apk'";
+        string cmdPath = "'" + path + "/" + PlayerSettings.productName + "'";
 
         BashUtils.RunCommandInPath(TERMINAL_CHOOSED, adbCmd, cmdPath);
+        // BashUtils.RunCommandWithGUI(adbCmd, cmdPath);
     }
 }
 
