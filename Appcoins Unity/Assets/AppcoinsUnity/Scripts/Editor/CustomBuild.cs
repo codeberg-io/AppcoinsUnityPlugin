@@ -90,23 +90,28 @@ public class CustomUnixBuild : CustomBuild
 
         if(target.ToLower() == ANDROID_STRING)
         {
-            stage = BuildStage.UNITY_BUILD;
+            ChangeStage(BuildStage.UNITY_BUILD);
             path = this.AndroidCustomBuild(scenesPath);
         }
 
         if(path != null)
         {
-            stage = BuildStage.GRADLE_BUILD;
+            ChangeStage(BuildStage.GRADLE_BUILD);
             UnixBuild(path);
             
             if(CustomUnixBuild.runAdbInstall)
             {
-                stage = BuildStage.ADB_INSTALL;
+                ChangeStage(BuildStage.ADB_INSTALL);
                 AdbInstall(path);
             }
         }
 
-        stage = BuildStage.DONE;
+        ChangeStage(BuildStage.DONE);
+    }
+
+    public void ChangeStage(BuildStage theStage) {
+        stage = theStage;
+        CustomBuildWindow.ForceUIUpdate();
     }
 
     private string AndroidCustomBuild(string[] scenesPath)
@@ -182,23 +187,109 @@ public class CustomUnixBuild : CustomBuild
     }
 }
 
-// Custom class to save the loaded scenes and a bool for each scene that tells us if the user wants to export such scene or not.
-public class SceneToExport
+// Draw the window for the user select what scenes he wants to export and configure player settings.
+public class CustomBuildWindow : EditorWindow
 {
-    private bool _exportScene;
-    public bool exportScene
+    public static CustomBuildWindow instance;
+    private SceneToExport[] scenes;
+    public Vector2 scrollViewVector = Vector2.zero;
+
+    public static void ForceUIUpdate()
     {
-        get { return _exportScene; }
-        set { _exportScene = value; }
+        UnityEngine.Debug.Log("Paint instance " + instance );
+        instance.Repaint();
     }
 
-    private UnityEngine.SceneManagement.Scene _scene;
-    public UnityEngine.SceneManagement.Scene scene 
+    //Create the custom Editor Window
+    public static void CreateExportScenesWindow(SceneToExport[] openScenes)
     {
-        get { return _scene; }
-        set { _scene = value; }
+        CustomBuildWindow.instance = (CustomBuildWindow)EditorWindow.GetWindowWithRect(
+            typeof(CustomBuildWindow),
+            new Rect(0, 0, 600, 400),
+            true,
+            "Custom Build Settings"
+        );
+
+        instance.scenes = openScenes;
+        instance.minSize = new Vector2(600, 400);
+        instance.autoRepaintOnSceneChange = true;
+        instance.Show();
+    }
+
+    public void OnInspectorUpdate()
+    {
+        // This will only get called 10 times per second.
+        Repaint();
+    }
+
+    // Display all the scenes, a button to open 'Player Settings, one to cancel and other to confirm(continue).
+    void OnGUI()
+    {
+        switch (CustomUnixBuild.stage)
+        {
+            case CustomUnixBuild.BuildStage.IDLE:
+                CreateCustomBuildUI();
+                break;
+            case CustomUnixBuild.BuildStage.UNITY_BUILD:
+                GUI.Label(new Rect(5, 30, 590, 40), "building gradle project...");
+                break;
+            case CustomUnixBuild.BuildStage.GRADLE_BUILD:
+                GUI.Label(new Rect(5, 30, 590, 40), "Running gradle to generate APK...");
+                break;
+            case CustomUnixBuild.BuildStage.ADB_INSTALL:
+                GUI.Label(new Rect(5, 30, 590, 40), "Installing APK...");
+                break;
+            case CustomUnixBuild.BuildStage.ADB_RUN:
+                GUI.Label(new Rect(5, 30, 590, 40), "Running APK...");
+                break;
+            case CustomUnixBuild.BuildStage.DONE:
+                this.Close();
+                break;
+        }
+    }
+
+    void CreateCustomBuildUI()
+    {
+        float gradlePartHeight = 5;
+        GUI.Label(new Rect(5, gradlePartHeight, 590, 40), "Select the gradle path");
+        gradlePartHeight += 20;
+        CustomUnixBuild.gradlePath = GUI.TextField(new Rect(5, gradlePartHeight, 590, 20), CustomUnixBuild.gradlePath);
+
+        float adbPartHeight = gradlePartHeight + 20;
+        GUI.Label(new Rect(5, adbPartHeight, 590, 40), "Select the adb path");
+        adbPartHeight += 20;
+        CustomUnixBuild.adbPath = GUI.TextField(new Rect(5, adbPartHeight, 590, 20), CustomUnixBuild.adbPath);
+        adbPartHeight += 20;
+        CustomUnixBuild.runAdbInstall = GUI.Toggle(new Rect(5, adbPartHeight, 590, 20), CustomUnixBuild.runAdbInstall, "Install build when done?");
+
+        float scenesPartHeight = adbPartHeight + 20;
+        GUI.Label(new Rect(5, scenesPartHeight, 590, 40), "Select what scenes you want to export:\n(Only scenes that are in build settings are true by default)");
+        float scrollViewLength = scenes.Length * 25f;
+        scenesPartHeight += 25;
+        scrollViewVector = GUI.BeginScrollView(new Rect(5, scenesPartHeight, 590, 330), scrollViewVector, new Rect(0, 0, 590, scrollViewLength));
+        for (int i = 0; i < scenes.Length; i++)
+        {
+            scenes[i].exportScene = GUI.Toggle(new Rect(10, 10 + i * 20, 100, 20), scenes[i].exportScene, scenes[i].scene.name);
+        }
+        GUI.EndScrollView();
+
+        if (GUI.Button(new Rect(5, 370, 100, 20), "Player Settings"))
+        {
+            EditorApplication.ExecuteMenuItem("Edit/Project Settings/Player");
+        }
+        if (GUI.Button(new Rect(460, 370, 60, 20), "Cancel"))
+        {
+            this.Close();
+        }
+
+        if (CustomUnixBuild.gradlePath != "" && GUI.Button(new Rect(530, 370, 60, 20), "Confirm"))
+        {
+            CustomBuild.continueProcessEvent.Invoke();
+            this.Close();
+        }
     }
 }
+
 
 // Get all the loaded scenes and aks to the user what scenes he wants to export by 'ExportScenesWindow' class.
 public class ExportScenes
@@ -248,94 +339,26 @@ public class ExportScenes
     // Open ExportScenesWindow window.
     public SceneToExport[] SelectScenesToExport() 
     {
-        ExportScenesWindow.CreateExportScenesWindow(scenes);
+        CustomBuildWindow.CreateExportScenesWindow(scenes);
         return scenes;
     }
+}
 
-    // Draw the window for the user select what scenes he wants to export and configure player settings.
-    private class ExportScenesWindow : EditorWindow
+
+// Custom class to save the loaded scenes and a bool for each scene that tells us if the user wants to export such scene or not.
+public class SceneToExport
+{
+    private bool _exportScene;
+    public bool exportScene
     {
-        private SceneToExport[] scenes;
-        public Vector2 scrollViewVector = Vector2.zero;
+        get { return _exportScene; }
+        set { _exportScene = value; }
+    }
 
-        //Create the custom Editor Window
-        public static void CreateExportScenesWindow(SceneToExport[] openScenes)
-        {
-            ExportScenesWindow scenesWindow = (ExportScenesWindow) EditorWindow.GetWindowWithRect(
-                typeof(ExportScenesWindow), 
-                new Rect(0, 0, 600, 400), 
-                true, 
-                "Custom Build Settings"
-            );
-
-            scenesWindow.scenes = openScenes;
-            scenesWindow.minSize = new Vector2(600, 400);
-            scenesWindow.Show();
-        }
-
-        // Display all the scenes, a button to open 'Player Settings, one to cancel and other to confirm(continue).
-        void OnGUI()
-        {
-            switch(CustomUnixBuild.stage) {
-                case CustomUnixBuild.BuildStage.IDLE:
-                    CreateCustomBuildUI();
-                    break;
-                case CustomUnixBuild.BuildStage.UNITY_BUILD:
-                    GUI.Label(new Rect(5, 30, 590, 40), "building gradle project...");
-                    break;
-                case CustomUnixBuild.BuildStage.GRADLE_BUILD:
-                    GUI.Label(new Rect(5, 30, 590, 40), "Running gradle to generate APK...");
-                    break;
-                case CustomUnixBuild.BuildStage.ADB_INSTALL:
-                    GUI.Label(new Rect(5, 30, 590, 40), "Installing APK...");
-                    break;
-                case CustomUnixBuild.BuildStage.ADB_RUN:
-                    GUI.Label(new Rect(5, 30, 590, 40), "Running APK...");
-                    break;
-                case CustomUnixBuild.BuildStage.DONE:
-                    this.Close();
-                    break;
-            }
-        }
-
-        void CreateCustomBuildUI() {
-            float gradlePartHeight = 5;
-            GUI.Label(new Rect(5, gradlePartHeight, 590, 40), "Select the gradle path");
-            gradlePartHeight += 20;
-            CustomUnixBuild.gradlePath = GUI.TextField(new Rect(5, gradlePartHeight, 590, 20), CustomUnixBuild.gradlePath);
-
-            float adbPartHeight = gradlePartHeight + 20;
-            GUI.Label(new Rect(5, adbPartHeight, 590, 40), "Select the adb path");
-            adbPartHeight += 20;
-            CustomUnixBuild.adbPath = GUI.TextField(new Rect(5, adbPartHeight, 590, 20), CustomUnixBuild.adbPath);
-            adbPartHeight += 20;
-            CustomUnixBuild.runAdbInstall = GUI.Toggle(new Rect(5, adbPartHeight, 590, 20), CustomUnixBuild.runAdbInstall, "Install build when done?");
-
-            float scenesPartHeight = adbPartHeight + 20;
-            GUI.Label(new Rect(5, scenesPartHeight, 590, 40), "Select what scenes you want to export:\n(Only scenes that are in build settings are true by default)");
-            float scrollViewLength = scenes.Length * 25f;
-            scenesPartHeight += 25;
-            scrollViewVector = GUI.BeginScrollView(new Rect(5, scenesPartHeight, 590, 330), scrollViewVector, new Rect(0, 0, 590, scrollViewLength));
-            for (int i = 0; i < scenes.Length; i++)
-            {
-                scenes[i].exportScene = GUI.Toggle(new Rect(10, 10 + i * 20, 100, 20), scenes[i].exportScene, scenes[i].scene.name);
-            }
-            GUI.EndScrollView();
-
-            if (GUI.Button(new Rect(5, 370, 100, 20), "Player Settings"))
-            {
-                EditorApplication.ExecuteMenuItem("Edit/Project Settings/Player");
-            }
-            if (GUI.Button(new Rect(460, 370, 60, 20), "Cancel"))
-            {
-                this.Close();
-            }
-
-            if (CustomUnixBuild.gradlePath != "" && GUI.Button(new Rect(530, 370, 60, 20), "Confirm"))
-            {
-                CustomBuild.continueProcessEvent.Invoke();
-                this.Close();
-            }
-        }
+    private UnityEngine.SceneManagement.Scene _scene;
+    public UnityEngine.SceneManagement.Scene scene
+    {
+        get { return _scene; }
+        set { _scene = value; }
     }
 }
