@@ -10,6 +10,8 @@ using UnityEditor;
 public class BashUtils {
 	private static Thread runBash;
     private static StringBuilder procOutput = null;
+    private static string readWindowsArgs = "/c ";
+    private static string readUnixArgs = "-c ";
 
     public static void RunCommandInPath(string terminalPath, string cmd, string path)
     {
@@ -19,16 +21,27 @@ public class BashUtils {
         ProcessStartInfo processInfo = new ProcessStartInfo();
         processInfo.FileName = terminalPath;
         processInfo.WorkingDirectory = "/";
+        processInfo.CreateNoWindow = true;
 
         if (path != "")
         {
-            processInfo.Arguments = "-c \"cd " + path + " && " +
+            processInfo.Arguments = "\"cd " + path + " && " +
                                                 cmd + "\"";
         }
         else
         {
-            processInfo.Arguments = "-c \" " +
+            processInfo.Arguments = "\" " +
                                                 cmd + "\"";
+        }
+
+        if(terminalPath.Substring(0, 3) == "cmd")
+        {
+            processInfo.Arguments = readWindowsArgs + processInfo.Arguments;
+        }
+
+        else
+        {
+            processInfo.Arguments = readUnixArgs + processInfo.Arguments;
         }
 
         UnityEngine.Debug.Log("process args: " + processInfo.Arguments);

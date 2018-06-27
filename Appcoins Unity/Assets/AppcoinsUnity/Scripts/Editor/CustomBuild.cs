@@ -28,27 +28,22 @@ public class CustomBuildMenuItem : EditorWindow {
     //     unixBuild.AdbInstall(path);
     // }
 
-    // [MenuItem("Custom Build/Terminal")]
-    // public static void Terminal()
-    // {
-    //     Process newProcess = new Process();
-    //     newProcess.StartInfo.FileName = "/bin/bash";
-    //     newProcess.StartInfo.WorkingDirectory = "/";
-    //     // newProcess.StartInfo.Arguments = "-c \"say hello\"";
-    //     newProcess.StartInfo.UseShellExecute = false;
-    //     newProcess.StartInfo.RedirectStandardInput = true;
-    //     newProcess.StartInfo.RedirectStandardOutput = true;
-    //     newProcess.StartInfo.ErrorDialog = false;
+    [MenuItem("Custom Build/Terminal")]
+    public static void Terminal()
+    {
+        Process newProcess = new Process();
+        newProcess.StartInfo.FileName = "/bin/bash";
+        newProcess.StartInfo.WorkingDirectory = "/";
+        newProcess.StartInfo.Arguments = "-c \"echo hello world! && ls -a -l\"";
+        newProcess.StartInfo.UseShellExecute = false;
+        newProcess.StartInfo.RedirectStandardInput = true;
+        newProcess.StartInfo.RedirectStandardOutput = true;
+        newProcess.StartInfo.ErrorDialog = false;
 
-    //     newProcess.Start();
-    //     StreamWriter sWriter = newProcess.StandardInput;
-    //     sWriter.WriteLine("say hello");
-    //     sWriter.WriteLine("exit");
-    //     newProcess.StandardInput.Flush();
-    //     newProcess.StandardInput.Close();
-    //     // string out = newProcess.StandardOutput.ReadToEnd();
-    //     newProcess.WaitForExit();
-    // }
+        newProcess.Start();
+        // string out = newProcess.StandardOutput.ReadToEnd();
+        newProcess.WaitForExit();
+    }
 }
 
 public class CustomBuild
@@ -199,8 +194,8 @@ public class CustomBuild
     {
         this.CheckAppPath(ref CustomBuild.gradlePath, "gradle");
 
-        string gradleCmd = "'" + gradlePath + "gradle' build";
-        string cmdPath = "'" + path + "/" + PlayerSettings.productName + "'";
+        string gradleCmd = "\"" + gradlePath + "gradle\" build";
+        string cmdPath = "\"" + path + "/" + PlayerSettings.productName + "\"";
 
         BashUtils.RunCommandInPath(TERMINAL_CHOOSED, gradleCmd, cmdPath);
         // BashUtils.RunCommandWithGUI(gradleCmd, cmdPath);
@@ -210,8 +205,8 @@ public class CustomBuild
     {
         this.CheckAppPath(ref CustomBuild.adbPath, "adb");
 
-        string adbCmd = "'" + CustomBuild.adbPath + "adb' install -r './build/outputs/apk/release/" + PlayerSettings.productName + "-release.apk'";
-        string cmdPath = "'" + path + "/" + PlayerSettings.productName + "'";
+        string adbCmd = "\"" + CustomBuild.adbPath + "adb\" install -r \"./build/outputs/apk/release/" + PlayerSettings.productName + "-release.apk\"";
+        string cmdPath = "\"" + path + "/" + PlayerSettings.productName + "\"";
 
         BashUtils.RunCommandInPath(TERMINAL_CHOOSED, adbCmd, cmdPath);
         // BashUtils.RunCommandWithGUI(adbCmd, cmdPath);
