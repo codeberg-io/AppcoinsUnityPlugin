@@ -28,22 +28,53 @@ public class CustomBuildMenuItem : EditorWindow {
     //     unixBuild.AdbInstall(path);
     // }
 
-    [MenuItem("Custom Build/Terminal")]
-    public static void Terminal()
-    {
-        Process newProcess = new Process();
-        newProcess.StartInfo.FileName = "/bin/bash";
-        newProcess.StartInfo.WorkingDirectory = "/";
-        newProcess.StartInfo.Arguments = "-c \"echo hello world! && ls -a -l\"";
-        newProcess.StartInfo.UseShellExecute = false;
-        newProcess.StartInfo.RedirectStandardInput = true;
-        newProcess.StartInfo.RedirectStandardOutput = true;
-        newProcess.StartInfo.ErrorDialog = false;
+    // private static StringBuilder sortOutput = null;
+    // private static UnityEvent terminalEvent = new UnityEvent();
+    // private static bool finished = false;
+    // [MenuItem("Custom Build/Terminal")]
+    // public static void RunTerminal()
+    // {
+    //     // // Thread t = new Thread(CustomBuildMenuItem.Terminal);
+    //     // // t.Start();
+    //     // System.Threading.Tasks.Task.Run(() => Terminal());
+    //     // CustomBuildMenuItem.terminalEvent.AddListener(
+    //     //     delegate
+    //     //     {
+    //     //         UnityEngine.Debug.Log("a");
+    //     //     }
+    //     // );
+    //     // while(!CustomBuildMenuItem.finished);
 
-        newProcess.Start();
-        // string out = newProcess.StandardOutput.ReadToEnd();
-        newProcess.WaitForExit();
-    }
+    //     Terminal();
+    // }
+
+    // public static void Terminal()
+    // {
+    //     Process newProcess = new Process();
+    //     newProcess.StartInfo.FileName = "/bin/bash";
+    //     newProcess.StartInfo.WorkingDirectory = "/";
+    //     newProcess.StartInfo.Arguments = "-c \"echo hello world! && ls -a -l && seq 1 50000\"";
+    //     newProcess.StartInfo.UseShellExecute = false;
+    //     newProcess.StartInfo.RedirectStandardOutput = true;
+    //     newProcess.StartInfo.ErrorDialog = false;
+    //     sortOutput = new StringBuilder("");
+    //     newProcess.OutputDataReceived += new DataReceivedEventHandler(SortOutputHandler);
+    //     newProcess.Start();
+    //     newProcess.BeginOutputReadLine();
+    //     // string out = newProcess.StandardOutput.ReadToEnd();
+    //     while(!newProcess.HasExited);
+    //     CustomBuildMenuItem.finished = true;
+    // }
+
+    // private static void SortOutputHandler(object sendingProcess, 
+    //         DataReceivedEventArgs outLine)
+    // {
+    //     // Collect the sort command output.
+    //     if (!String.IsNullOrEmpty(outLine.Data))
+    //     {
+    //         UnityEngine.Debug.Log(outLine.Data);
+    //     }
+    // }
 }
 
 public class CustomBuild

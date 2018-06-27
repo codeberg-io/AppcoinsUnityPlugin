@@ -1,15 +1,14 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading;
 using UnityEngine;
-using UnityEditor;
 
 public class BashUtils {
 	private static Thread runBash;
-    private static StringBuilder procOutput = null;
     private static string readWindowsArgs = "/c ";
     private static string readUnixArgs = "-c ";
 
