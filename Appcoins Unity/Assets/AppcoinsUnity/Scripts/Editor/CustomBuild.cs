@@ -194,8 +194,8 @@ public class CustomBuild
     {
         this.CheckAppPath(ref CustomBuild.gradlePath, "gradle");
 
-        string gradleCmd = "\"" + gradlePath + "gradle\" build";
-        string cmdPath = "\"" + path + "/" + PlayerSettings.productName + "\"";
+        string gradleCmd = "'" + gradlePath + "gradle' build";
+        string cmdPath = "'" + path + "/" + PlayerSettings.productName + "'";
 
         BashUtils.RunCommandInPath(TERMINAL_CHOOSED, gradleCmd, cmdPath);
         // BashUtils.RunCommandWithGUI(gradleCmd, cmdPath);
@@ -205,8 +205,8 @@ public class CustomBuild
     {
         this.CheckAppPath(ref CustomBuild.adbPath, "adb");
 
-        string adbCmd = "\"" + CustomBuild.adbPath + "adb\" install -r \"./build/outputs/apk/release/" + PlayerSettings.productName + "-release.apk\"";
-        string cmdPath = "\"" + path + "/" + PlayerSettings.productName + "\"";
+        string adbCmd = "'" + CustomBuild.adbPath + "adb' install -r './build/outputs/apk/release/" + PlayerSettings.productName + "-release.apk'";
+        string cmdPath = "'" + path + "/" + PlayerSettings.productName + "'";
 
         BashUtils.RunCommandInPath(TERMINAL_CHOOSED, adbCmd, cmdPath);
         // BashUtils.RunCommandWithGUI(adbCmd, cmdPath);

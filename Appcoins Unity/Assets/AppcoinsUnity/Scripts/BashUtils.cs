@@ -37,11 +37,13 @@ public class BashUtils {
         if(terminalPath.Substring(0, 3) == "cmd")
         {
             processInfo.Arguments = readWindowsArgs + processInfo.Arguments;
+            processInfo.Arguments.Replace("'", "\"");
         }
 
         else
         {
             processInfo.Arguments = readUnixArgs + processInfo.Arguments;
+            processInfo.Arguments.Replace("\"", "'");
         }
 
         UnityEngine.Debug.Log("process args: " + processInfo.Arguments);
