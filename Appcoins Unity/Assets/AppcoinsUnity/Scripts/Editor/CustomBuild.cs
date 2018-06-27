@@ -60,7 +60,9 @@ public class CustomBuild
         DONE,
     }
 
-    public static string gradlePath = "/Applications/Android Studio.app/Contents/gradle/gradle-4.4/bin/";
+    public static string gradlePath = null;
+    private static string gradleWindowsPath = "C:\\Program Files\\Android\\Android Studio\\gradle\\gradle-4.4\\bin\\gradle";
+    private static string gradleUnixPath = "/Applications/Android Studio.app/Contents/gradle/gradle-4.4/bin/";
     public static string adbPath = EditorPrefs.GetString("AndroidSdkRoot") + "/platform-tools/adb";
     public static bool runAdbInstall = false;
     public static BuildStage stage;
@@ -76,11 +78,13 @@ public class CustomBuild
             SystemInfo.operatingSystemFamily == OperatingSystemFamily.Linux)
         {
             TERMINAL_CHOOSED = BASH_LOCATION;
+            gradlePath = gradleUnixPath;
         }
 
         else if(SystemInfo.operatingSystemFamily == OperatingSystemFamily.Windows)
         {
             TERMINAL_CHOOSED = CMD_LOCATION;
+            gradlePath = gradleWindowsPath;
         }
 
         else {

@@ -44,7 +44,6 @@ public class BashUtils {
         else
         {
             processInfo.Arguments = readUnixArgs + processInfo.Arguments;
-            processInfo.Arguments = processInfo.Arguments.Replace("\"", "'");
         }
 
         UnityEngine.Debug.Log("process args: " + processInfo.Arguments);
