@@ -133,21 +133,17 @@ public class BashGUI : Bash
     }
 }
 
-public abstract class CMD : Terminal
+public class CMD : Terminal
 {
     protected static string TERMINAL_PATH = "cmd.exe";
-}
+    private static bool NO_GUI = false;
 
-public class CMDCommandLine : CMD
-{
     public override void RunCommand(string cmd, string path)
     {
-        UnityEngine.Debug.Log("Cmd is " + cmd);
-        UnityEngine.Debug.Log("Path is " + path);
-
+        string arguments = null;
         ProcessStartInfo processInfo = InitializeProcessInfo(TERMINAL_PATH);
-        processInfo.RedirectStandardOutput = true;
-        processInfo.RedirectStandardError = true;
+        processInfo.CreateNoWindow = NO_GUI;
+        processInfo.RedirectStandardInput = true;
 
         if (path != "")
         {
@@ -162,43 +158,7 @@ public class CMDCommandLine : CMD
         processInfo.Arguments = processInfo.Arguments.Replace("\"", "");
         processInfo.Arguments = processInfo.Arguments.Replace("'", "\"");
 
-        UnityEngine.Debug.Log("process args: " + processInfo.Arguments);
-
         Process newProcess = Process.Start(processInfo);
-
-        string strOutput = newProcess.StandardOutput.ReadToEnd();
-        string strError = newProcess.StandardError.ReadToEnd();
-
         newProcess.WaitForExit();
-        UnityEngine.Debug.Log(strOutput);
-        UnityEngine.Debug.Log("Process exited with code " + newProcess.ExitCode + "\n and errors: " + strError);
-    }
-}
-
-public class CMDGUI : CMD
-{
-    public override void RunCommand(string cmd, string path)
-    {
-        string arguments = null;
-        ProcessStartInfo processInfo = InitializeProcessInfo(TERMINAL_PATH);
-        processInfo.CreateNoWindow = false;
-        processInfo.RedirectStandardInput = true;
-
-        if (path != "")
-        {
-            arguments = "/c \"cd " + path + " && " + cmd + "\"";
-        }
-        else
-        {
-            arguments = "/c \"" + cmd + "\"";
-        }
-
-        // Replace string from bash fromat to cmd format
-        arguments = arguments.Replace("\"", "");
-        arguments = arguments.Replace("'", "\"");
-
-        Process newProcess = Process.Start(processInfo);
-        newProcess.StandardInput.WriteLine(arguments);
-        newProcess.WaitForExit();        
     }
 }

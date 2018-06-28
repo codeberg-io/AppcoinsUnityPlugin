@@ -244,7 +244,7 @@ public class CustomBuild
         Terminal terminal = null;
         if(TERMINAL_CHOOSED == CMD_LOCATION)
         {
-            terminal = new CMDGUI();
+            terminal = new CMD();
         }
 
         else
@@ -265,7 +265,7 @@ public class CustomBuild
         Terminal terminal = null;
         if(TERMINAL_CHOOSED == CMD_LOCATION)
         {
-            terminal = new CMDGUI();
+            terminal = new CMD();
         }
 
         else
