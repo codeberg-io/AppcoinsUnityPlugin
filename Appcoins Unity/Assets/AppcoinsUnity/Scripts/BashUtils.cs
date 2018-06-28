@@ -91,22 +91,6 @@ public class BashCommandLine : Bash
 
 public class BashGUI : Bash
 {
-    // protected override void RunBashCommand(string cmd, string path)
-    // {
-    //     CreateSHFileToExecuteCommand(cmd, path);
-
-    //     ProcessStartInfo processInfo = InitializeProcessInfo(TERMINAL_PATH);
-    //     processInfo.CreateNoWindow = false;
-
-	//     processInfo.Arguments = "-c \"chmod +x '" + Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.sh' && " +
-    //                             "open -n -W /Applications/Utilities/Terminal.app --args '" + Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.sh' && exit\"";
-
-	//     Process newProcess = new Process();   
-	//     newProcess.StartInfo = processInfo;
-	//     newProcess.Start();
-    //     newProcess.WaitForExit();
-    // }
-
     protected override void RunBashCommand(string cmd, string path)
     {
         CreateSHFileToExecuteCommand(cmd, path);
@@ -115,32 +99,37 @@ public class BashGUI : Bash
         processInfo.CreateNoWindow = false;
 
 	    processInfo.Arguments = "-c \"chmod +x '" + Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.sh' && " +
-                                "open -n -W /Applications/Utilities/Terminal.app --args '" + Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.sh' && exit\"";
+                                "open -n /Applications/Utilities/Terminal.app --args '" + 
+                                Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.sh'\"";
 
 	    Process newProcess = new Process();   
 	    newProcess.StartInfo = processInfo;
 	    newProcess.Start();
-        newProcess.WaitForExit();
+
+        while(!File.Exists(Application.dataPath + "/AppcoinsUnity/Tools/ProcessCompleted.out"))
+        {
+            Thread.Sleep(5000);
+        }
+
+        if(!newProcess.HasExited)
+        {
+            newProcess.Kill();
+        }
     }
 
     private void CreateSHFileToExecuteCommand(string cmd, string path)
     {
-        StreamWriter writer = new StreamWriter(Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.sh");
+        StreamWriter writer = new StreamWriter(Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.sh", false);
 
         writer.WriteLine("#!/bin/sh");
-        writer.WriteLine("echo =======================");
-        writer.WriteLine("echo $$");
-        writer.WriteLine("echo =======================");
-        writer.WriteLine("echo $PPID");
-        writer.WriteLine("echo =======================");
-        writer.WriteLine("ps -o ppid=$PPID");
-        writer.WriteLine("echo =======================");
-        writer.WriteLine("ps -f");
         writer.WriteLine("cd " + path);
         writer.WriteLine(cmd);
-        writer.WriteLine("kill $PPID");
-        writer.WriteLine("kill $$");
+        writer.WriteLine("echo 'done' > '" + Application.dataPath + "/AppcoinsUnity/Tools/ProcessCompleted.out'");
+        writer.WriteLine("exit");
+        // writer.WriteLine("osascript -e 'tell application \"Terminal\" to close first window'");
         writer.Close();
+
+        File.Delete(Application.dataPath + "/AppcoinsUnity/Tools/ProcessCompleted.out");
     }
 }
 

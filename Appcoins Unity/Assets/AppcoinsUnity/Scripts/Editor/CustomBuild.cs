@@ -10,11 +10,6 @@ using System.Text;
 using System.Threading;
 
 public class CustomBuildMenuItem : EditorWindow {
-    // [MenuItem("Custom Build/File")]
-    // public static void file()
-    // {
-    //     UnityEngine.Debug.Log(Directory.Exists("/Applications/Utilities/Terminal.app"));
-    // }
 
     [MenuItem("Custom Build/Custom Android Build")]
     public static void CallAndroidCustomBuild()
@@ -23,6 +18,14 @@ public class CustomBuildMenuItem : EditorWindow {
         buildObj.ExecuteCustomBuild("android");
     }
 
+    // [MenuItem("Custom Build/File")]
+    // public static void file()
+    // {
+    //     StreamReader r = new StreamReader("/Users/aptoide/Desktop/complete.out");
+    //     UnityEngine.Debug.Log(r.ReadLine());
+    //     r.Close();
+    // }
+    
     // [MenuItem("Custom Build/ADB Install")]
     // public static void CallADBInstall()
     // {
