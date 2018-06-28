@@ -5,37 +5,24 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.asf.appcoins.sdk.iab.payment.PaymentStatus;
 import com.unity3d.player.UnityPlayer;
-
-import static com.aptoide.appcoinsunity.Application.appCoinsSdk;
 
 /**
  * Created by codeberg on 3/21/2018.
  * Modified by Aptoide
  */
 
-public class UnityAppcoins extends Fragment {
+public class UnityAppcoins  {
 
+    private static int REQUEST_CODE = 1337;
     private static  String developerAddress = "0xa43646ed0ece7595267ed7a2ff6f499f9f10f3c7";
     public static UnityAppcoins instance;
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        // keep fragment instance across activity recreation
-        setRetainInstance(true);
-    }
 
     public static void start()
     {
         Application.setupSDK(developerAddress);
-        // Instantiate Fragment.
-        instance = new UnityAppcoins();
-        // Add to the current 'Activity' (a static reference is stored in 'UnityPlayer').
-        UnityPlayer.currentActivity.getFragmentManager().beginTransaction().add(instance, "UnityAppcoins").commit();
 
+        instance = new UnityAppcoins();
     }
 
     public static void setAddress(String walletAddress){
@@ -45,13 +32,12 @@ public class UnityAppcoins extends Fragment {
     public static void makePurchase(String skuid)
     {
         if(Application.getIABFlag()) {
-            appCoinsSdk.buy(skuid, instance.getActivity()).subscribe(() -> {
-                // In this case the buy process was triggered as expected.
-            }, throwable -> {
-                // There was an error triggering the buy process.
-                throwable.printStackTrace();
-            });
+            Log.d("UnityAppCoins", "[PrepareBuy] Calling makePurchase with skuid" + skuid + ",");
 
+            Intent shareIntent = new Intent();
+            shareIntent.putExtra(PurchaseActivity.SKUID_TAG,skuid);
+            shareIntent.setClass(UnityPlayer.currentActivity,PurchaseActivity.class);
+            UnityPlayer.currentActivity.startActivityForResult(shareIntent, REQUEST_CODE);
         }
     }
 
@@ -63,34 +49,6 @@ public class UnityAppcoins extends Fragment {
 
     public  static void enableIAB(boolean iab){
         Application.setIAB(iab);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (Application.appCoinsSdk.onActivityResult(requestCode, requestCode, data)) {
-            Application.appCoinsSdk.getCurrentPayment()
-                    .subscribe(paymentDetails -> instance.getActivity().runOnUiThread(() -> {
-                        if (paymentDetails.getPaymentStatus() == PaymentStatus.SUCCESS) {
-                            String skuId = paymentDetails.getSkuId();
-                            // Now we tell the sdk to consume the skuId.
-                            Application.appCoinsSdk.consume(skuId);
-                            // Purchase successfully done. Release the prize.
-
-                            Log.d("UnityActivity", "AppcoinsUnity::purchaseSuccess! skuid " + skuId);
-
-                            UnityPlayer.UnitySendMessage("AppcoinsUnity","purchaseSuccess",skuId);
-                        }
-                        else{
-                            String skuId = paymentDetails.getSkuId();
-
-                            Log.d("UnityActivity", "AppcoinsUnity::purchaseFailure! skuid " + skuId);
-
-                            UnityPlayer.UnitySendMessage("AppcoinsUnity","purchaseFailure",skuId);
-                        }
-                    }));
-        }
     }
 
 }

@@ -5,6 +5,7 @@ package com.aptoide.appcoinsunity;
  * Modified by Aptoide
  */
 
+import android.app.Activity;
 import android.util.Log;
 
 import com.asf.appcoins.sdk.ads.AppCoinsAds;
@@ -26,6 +27,7 @@ public class Application extends android.app.Application {
     static boolean POAFlag=false;
     static boolean IABFlag=false;
     static android.app.Application application;
+    static Activity purchaseActivity;
 
     @Override
     public void onCreate() {
