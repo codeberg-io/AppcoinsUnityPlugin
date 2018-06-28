@@ -7,50 +7,76 @@ using System.Text;
 using System.Threading;
 using UnityEngine;
 
-public class BashUtils {
-	private static Thread runBash;
-    private static string readWindowsArgs = "/c ";
-    private static string readUnixArgs = "-c ";
+// public class BashUtils {
+//     private static string readWindowsArgs = "/c ";
+//     private static string readUnixArgs = "-c ";
+// }
 
-    public static void RunCommandInPath(string terminalPath, string cmd, string path)
+public abstract class Terminal
+{
+    public ProcessStartInfo InitializeProcessInfo(string terminalPath)
+    {
+        ProcessStartInfo processInfo = new ProcessStartInfo();
+        processInfo.FileName = terminalPath;
+        processInfo.WorkingDirectory = "/";
+        processInfo.UseShellExecute = false;
+        processInfo.CreateNoWindow = true;
+        return processInfo;
+    }
+
+    public virtual void RunCommand(string cmd, string path) {}
+
+    public void RunTerminalCommand(string terminalPath, string cmd)
+    {
+        RunCommand(cmd, "");
+    }
+}
+
+public class Bash : Terminal
+{
+    protected static string TERMINAL_PATH = "/bin/bash";
+
+    protected virtual void RunBashCommand(string cmd, string path) {}
+
+    public override void RunCommand(string cmd, string path)
+    {
+        Bash t;
+
+        if(Directory.Exists("/Applications/Utilities/Terminal.app") || Directory.Exists("/Applications/Terminal.app"))
+        {
+            t = new BashGUI();
+            t.RunBashCommand(cmd, path);
+        }
+
+        else
+        {
+            t = new BashCommandLine();
+            t.RunBashCommand(cmd, path);
+        }
+    }
+}
+
+public class BashCommandLine : Bash
+{
+    protected override void RunBashCommand(string cmd, string path)
     {
         UnityEngine.Debug.Log("Cmd is " + cmd);
         UnityEngine.Debug.Log("Path is " + path);
 
-        ProcessStartInfo processInfo = new ProcessStartInfo();
-        processInfo.FileName = terminalPath;
-        processInfo.WorkingDirectory = "/";
-        processInfo.CreateNoWindow = true;
-
-        if (path != "")
-        {
-            processInfo.Arguments = "\"cd " + path + " && " +
-                                                cmd + "\"";
-        }
-        else
-        {
-            processInfo.Arguments = "\" " +
-                                                cmd + "\"";
-        }
-
-        if(terminalPath.Substring(0, 3) == "cmd")
-        {
-            processInfo.Arguments = readWindowsArgs + processInfo.Arguments;
-            processInfo.Arguments = processInfo.Arguments.Replace("\"", "");
-            processInfo.Arguments = processInfo.Arguments.Replace("'", "\"");
-        }
-
-        else
-        {
-            processInfo.Arguments = readUnixArgs + processInfo.Arguments;
-        }
-
-        UnityEngine.Debug.Log("process args: " + processInfo.Arguments);
-
-        processInfo.UseShellExecute = false;
+        ProcessStartInfo processInfo = InitializeProcessInfo(TERMINAL_PATH);
         processInfo.RedirectStandardOutput = true;
         processInfo.RedirectStandardError = true;
 
+        if (path != "")
+        {
+            processInfo.Arguments = "-c \"cd " + path + " && " + cmd + "\"";
+        }
+        else
+        {
+            processInfo.Arguments = "-c \"" + cmd + "\"";
+        }
+
+        UnityEngine.Debug.Log("process args: " + processInfo.Arguments);
 
         Process newProcess = Process.Start(processInfo);
 
@@ -61,18 +87,35 @@ public class BashUtils {
         UnityEngine.Debug.Log(strOutput);
         UnityEngine.Debug.Log("Process exited with code " + newProcess.ExitCode + "\n and errors: " + strError);
     }
+}
 
-    public static void RunCommandWithGUI(string cmd, string path)
+public class BashGUI : Bash
+{
+    // protected override void RunBashCommand(string cmd, string path)
+    // {
+    //     CreateSHFileToExecuteCommand(cmd, path);
+
+    //     ProcessStartInfo processInfo = InitializeProcessInfo(TERMINAL_PATH);
+    //     processInfo.CreateNoWindow = false;
+
+	//     processInfo.Arguments = "-c \"chmod +x '" + Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.sh' && " +
+    //                             "open -n -W /Applications/Utilities/Terminal.app --args '" + Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.sh' && exit\"";
+
+	//     Process newProcess = new Process();   
+	//     newProcess.StartInfo = processInfo;
+	//     newProcess.Start();
+    //     newProcess.WaitForExit();
+    // }
+
+    protected override void RunBashCommand(string cmd, string path)
     {
-        BashUtils.CreateSHFileToExecuteCommand(cmd, path);
+        CreateSHFileToExecuteCommand(cmd, path);
 
-        ProcessStartInfo processInfo = new ProcessStartInfo();
-        processInfo.FileName = "/bin/bash";
-        processInfo.WorkingDirectory = "/";
+        ProcessStartInfo processInfo = InitializeProcessInfo(TERMINAL_PATH);
+        processInfo.CreateNoWindow = false;
+
 	    processInfo.Arguments = "-c \"chmod +x '" + Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.sh' && " +
-                                "open -n /Applications/Utilities/Terminal.app --args '" + Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.sh'\"";
-
-        processInfo.UseShellExecute = false;
+                                "open -n -W /Applications/Utilities/Terminal.app --args '" + Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.sh' && exit\"";
 
 	    Process newProcess = new Process();   
 	    newProcess.StartInfo = processInfo;
@@ -80,19 +123,93 @@ public class BashUtils {
         newProcess.WaitForExit();
     }
 
-    private static void CreateSHFileToExecuteCommand(string cmd, string path)
+    private void CreateSHFileToExecuteCommand(string cmd, string path)
     {
         StreamWriter writer = new StreamWriter(Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.sh");
 
         writer.WriteLine("#!/bin/sh");
-        writer.WriteLine("cd '" + path + "'");
-        writer.WriteLine("ls -l");
+        writer.WriteLine("echo =======================");
+        writer.WriteLine("echo $$");
+        writer.WriteLine("echo =======================");
+        writer.WriteLine("echo $PPID");
+        writer.WriteLine("echo =======================");
+        writer.WriteLine("ps -o ppid=$PPID");
+        writer.WriteLine("echo =======================");
+        writer.WriteLine("ps -f");
+        writer.WriteLine("cd " + path);
         writer.WriteLine(cmd);
+        writer.WriteLine("kill $PPID");
+        writer.WriteLine("kill $$");
         writer.Close();
     }
+}
 
-    public static void RunBashCommand(string terminalPath, string cmd)
+public abstract class CMD : Terminal
+{
+    protected static string TERMINAL_PATH = "cmd.exe";
+}
+
+public class CMDCommandLine : CMD
+{
+    public override void RunCommand(string cmd, string path)
     {
-        RunCommandInPath(terminalPath, cmd, "");
+        UnityEngine.Debug.Log("Cmd is " + cmd);
+        UnityEngine.Debug.Log("Path is " + path);
+
+        ProcessStartInfo processInfo = InitializeProcessInfo(TERMINAL_PATH);
+        processInfo.RedirectStandardOutput = true;
+        processInfo.RedirectStandardError = true;
+
+        if (path != "")
+        {
+            processInfo.Arguments = "/c \"cd " + path + " && " + cmd + "\"";
+        }
+        else
+        {
+            processInfo.Arguments = "/c \"" + cmd + "\"";
+        }
+
+        // Replace string from bash fromat to cmd format
+        processInfo.Arguments = processInfo.Arguments.Replace("\"", "");
+        processInfo.Arguments = processInfo.Arguments.Replace("'", "\"");
+
+        UnityEngine.Debug.Log("process args: " + processInfo.Arguments);
+
+        Process newProcess = Process.Start(processInfo);
+
+        string strOutput = newProcess.StandardOutput.ReadToEnd();
+        string strError = newProcess.StandardError.ReadToEnd();
+
+        newProcess.WaitForExit();
+        UnityEngine.Debug.Log(strOutput);
+        UnityEngine.Debug.Log("Process exited with code " + newProcess.ExitCode + "\n and errors: " + strError);
+    }
+}
+
+public class CMDGUI : CMD
+{
+    public override void RunCommand(string cmd, string path)
+    {
+        string arguments = null;
+        ProcessStartInfo processInfo = InitializeProcessInfo(TERMINAL_PATH);
+        processInfo.CreateNoWindow = false;
+        processInfo.RedirectStandardInput = true;
+
+        if (path != "")
+        {
+            arguments = "/c \"cd " + path + " && " + cmd + "\"";
+        }
+        else
+        {
+            arguments = "/c \"" + cmd + "\"";
+        }
+
+        // Replace string from bash fromat to cmd format
+        arguments = arguments.Replace("\"", "");
+        arguments = arguments.Replace("'", "\"");
+
+        Process newProcess = Process.Start(processInfo);
+        newProcess.StandardInput.WriteLine(arguments);
+        newProcess.WaitForExit();        
     }
 }
