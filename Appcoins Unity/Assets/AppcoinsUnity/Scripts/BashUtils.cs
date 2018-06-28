@@ -91,32 +91,6 @@ public class BashCommandLine : Bash
 
 public class BashGUI : Bash
 {
-    // protected override void RunBashCommand(string cmd, string path)
-    // {
-    //     CreateSHFileToExecuteCommand(cmd, path);
-
-    //     ProcessStartInfo processInfo = InitializeProcessInfo(TERMINAL_PATH);
-    //     processInfo.CreateNoWindow = false;
-
-	//     processInfo.Arguments = "-c \"chmod +x '" + Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.sh' && " +
-    //                             "open -n /Applications/Utilities/Terminal.app --args '" + 
-    //                             Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.sh'\"";
-
-	//     Process newProcess = new Process();   
-	//     newProcess.StartInfo = processInfo;
-	//     newProcess.Start();
-
-    //     while(!File.Exists(Application.dataPath + "/AppcoinsUnity/Tools/ProcessCompleted.out"))
-    //     {
-    //         Thread.Sleep(5000);
-    //     }
-
-    //     if(!newProcess.HasExited)
-    //     {
-    //         newProcess.Kill();
-    //     }
-    // }
-
     protected override void RunBashCommand(string cmd, string path)
     {
         CreateSHFileToExecuteCommand(cmd, path);
@@ -125,7 +99,7 @@ public class BashGUI : Bash
         processInfo.FileName = "/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal";
         processInfo.CreateNoWindow = false;
 
-	    processInfo.Arguments = "'" + Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.sh' fg";
+	    processInfo.Arguments = "'" + Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.sh'";
 
 	    Process newProcess = new Process();   
 	    newProcess.StartInfo = processInfo;
@@ -147,6 +121,8 @@ public class BashGUI : Bash
         StreamWriter writer = new StreamWriter(Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.sh", false);
 
         writer.WriteLine("#!/bin/sh");
+
+        //Put terminal as first foreground application
         writer.WriteLine("osascript -e 'activate application \"/Applications/Utilities/Terminal.app\"'");
         writer.WriteLine("cd " + path);
         writer.WriteLine(cmd);
@@ -166,7 +142,6 @@ public class CMD : Terminal
 
     public override void RunCommand(string cmd, string path)
     {
-        string arguments = null;
         ProcessStartInfo processInfo = InitializeProcessInfo(TERMINAL_PATH);
         processInfo.CreateNoWindow = NO_GUI;
         processInfo.RedirectStandardInput = true;
