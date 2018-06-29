@@ -7,11 +7,6 @@ using System.Text;
 using System.Threading;
 using UnityEngine;
 
-// public class BashUtils {
-//     private static string readWindowsArgs = "/c ";
-//     private static string readUnixArgs = "-c ";
-// }
-
 public abstract class Terminal
 {
     public ProcessStartInfo InitializeProcessInfo(string terminalPath)
@@ -105,17 +100,20 @@ public class BashGUI : Bash
 	    newProcess.StartInfo = processInfo;
 	    newProcess.Start();
 
+        //For the process to complete we check with, 5s interval, for the existence of ProcessCompleted.out
         while(!File.Exists(Application.dataPath + "/AppcoinsUnity/Tools/ProcessCompleted.out"))
         {
             Thread.Sleep(5000);
         }
 
+        //Now we can safely kill the process
         if(!newProcess.HasExited)
         {
             newProcess.Kill();
         }
     }
 
+    //This creates a bash file that gets executed in the specified path
     private void CreateSHFileToExecuteCommand(string cmd, string path)
     {
         StreamWriter writer = new StreamWriter(Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.sh", false);
