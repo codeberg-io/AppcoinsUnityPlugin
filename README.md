@@ -82,7 +82,6 @@ public class Purchaser : AppcoinsPurchaser {
 
 ## To build the project
 
-**Unity 2018.2b (and above)**
 
 Go to the build menu (File -> Build Settings) and click _Player Settings_.
 
@@ -92,25 +91,40 @@ On the _Player Settings_ window:
 2. Make sure you change the package name to your liking (if it was Unity's default one now it changed to com.aptoide.appcoins).
 
 3. Make sure that you have min sdk version set to 21 (if the import was done correctly this should've changed automatically).
-4. Connect the phone to your machine and click _Build and Run_
+
+**Unity 2018.2b (and above)**
+
+1. Connect the phone to your machine and click _Build and Run_
 
 You should have your game running on the phone!
 
-**Unity 2018.1.X**
+**Unity 2018.1.X (and below)**
 
-Coming soon!
+1. Close the _Player Settings_ window
 
-**Unity 2017.X**
+2. On the top bar click _Custom Build_
 
-Coming soon!
+3. Click _Custom Android Build_
 
-**Unity 5.6.X**
+4. This popup will show up
+![picture](Screenshots/CustomBuildSettings.png)
 
-Coming soon!
+5. The gradle path should be picked from the path to your Android Studio installation
 
-**Unity 5.5.X**
+6. The adb path will be picked by you (assuming you have Android SDK installed)
 
-Coming soon!
+7. Pick the scenes you want to include. The one added to the build settings will automatically be selected for you
+
+8. When you click _Confirm_ a pop up will show up asking you to pick a folder to generate the _Android_ project to. Pick a folder of your liking preferably inside the project root (it can't be the project root itself)
+
+9. When you pick the folder the build process will start. The normal build process will happen and then the custom build process will kick in opening a terminal window. Unity might seem to be not responding but worry not! This is normal because it's waiting for the terminal processes to finish.
+
+10. If you ticked _Install build when done?_ make sure you have your phone connected to the computer and that you unlock it to allow ADB to run
+
+![picture](Screenshots/BuildDone.png)
+11. The build process completed. You can run the app on your phone!
+
+**NOTE:** Although the process screenshots show MacOS this process was tested and successfully ran on Windows and Linux as well!
 
 ## To run the project
 To successfully run the project you need to:
