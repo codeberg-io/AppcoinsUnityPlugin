@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading;
 
 public class CustomBuildMenuItem : EditorWindow {
+
     [MenuItem("Custom Build/Custom Android Build")]
     public static void CallAndroidCustomBuild()
     {
@@ -17,6 +18,14 @@ public class CustomBuildMenuItem : EditorWindow {
         buildObj.ExecuteCustomBuild("android");
     }
 
+    // [MenuItem("Custom Build/File")]
+    // public static void file()
+    // {
+    //     StreamReader r = new StreamReader("/Users/aptoide/Desktop/complete.out");
+    //     UnityEngine.Debug.Log(r.ReadLine());
+    //     r.Close();
+    // }
+    
     // [MenuItem("Custom Build/ADB Install")]
     // public static void CallADBInstall()
     // {
@@ -232,8 +241,18 @@ public class CustomBuild
         string gradleCmd = "'" + gradlePath + "gradle' build";
         string cmdPath = "'" + path + "/" + PlayerSettings.productName + "'";
 
-        BashUtils.RunCommandInPath(TERMINAL_CHOOSED, gradleCmd, cmdPath);
-        // BashUtils.RunCommandWithGUI(gradleCmd, cmdPath);
+        Terminal terminal = null;
+        if(TERMINAL_CHOOSED == CMD_LOCATION)
+        {
+            terminal = new CMD();
+        }
+
+        else
+        {
+            terminal = new Bash();
+        }
+
+        terminal.RunCommand(gradleCmd, cmdPath);
     }
 
     protected void AdbInstall(string path) 
@@ -243,8 +262,18 @@ public class CustomBuild
         string adbCmd = "'" + CustomBuild.adbPath + "adb' install -r './build/outputs/apk/release/" + PlayerSettings.productName + "-release.apk'";
         string cmdPath = "'" + path + "/" + PlayerSettings.productName + "'";
 
-        BashUtils.RunCommandInPath(TERMINAL_CHOOSED, adbCmd, cmdPath);
-        // BashUtils.RunCommandWithGUI(adbCmd, cmdPath);
+        Terminal terminal = null;
+        if(TERMINAL_CHOOSED == CMD_LOCATION)
+        {
+            terminal = new CMD();
+        }
+
+        else
+        {
+            terminal = new Bash();
+        }
+
+        terminal.RunCommand(adbCmd, cmdPath);
     }
 }
 
@@ -292,16 +321,16 @@ public class CustomBuildWindow : EditorWindow
                 CreateCustomBuildUI();
                 break;
             case CustomBuild.BuildStage.UNITY_BUILD:
-                GUI.Label(new Rect(5, 30, 590, 40), "building gradle project...");
+                GUI.Label(new Rect(5, 30, 590, 40), "building gradle project...\nPlease be patient...");
                 break;
             case CustomBuild.BuildStage.GRADLE_BUILD:
-                GUI.Label(new Rect(5, 30, 590, 40), "Running gradle to generate APK...");
+                GUI.Label(new Rect(5, 30, 590, 40), "Running gradle to generate APK...\nPlease be patient...");
                 break;
             case CustomBuild.BuildStage.ADB_INSTALL:
-                GUI.Label(new Rect(5, 30, 590, 40), "Installing APK...");
+                GUI.Label(new Rect(5, 30, 590, 40), "Installing APK...\nPlease be patient...");
                 break;
             case CustomBuild.BuildStage.ADB_RUN:
-                GUI.Label(new Rect(5, 30, 590, 40), "Running APK...");
+                GUI.Label(new Rect(5, 30, 590, 40), "Running APK...\nPlease be patient...");
                 break;
             case CustomBuild.BuildStage.DONE:
                 this.Close();
