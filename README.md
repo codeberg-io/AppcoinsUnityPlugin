@@ -14,7 +14,7 @@ This plugin is developed from a fork of the unofficial unity plugin for AppCoins
 
 ![picture](Screenshots/shot2.png)
 
-2. From the Assets -> AppcoinsUnity -> Prefabs folder drag and drop the _AppcoinsUnity_ prefab into your scene or hierarchy window. ** Note:do not change the name of the AppcoinsUnity prefab.**
+2. From the Assets -> AppcoinsUnity -> Prefabs folder drag and drop the _AppcoinsUnity_ prefab into your scene or hierarchy window. **Note: do not change the name of the AppcoinsUnity prefab.**
 
 ![picture](Screenshots/shot3.png)
 
@@ -107,13 +107,14 @@ You should have your game running on the phone!
 3. Click _Custom Android Build_
 
 4. This popup will show up
+
 ![picture](Screenshots/CustomBuildSettings.png)
 
 5. The gradle path should be picked from the path to your Android Studio installation
 
 6. The adb path will be picked by you (assuming you have Android SDK installed)
 
-7. Pick the scenes you want to include. The one added to the build settings will automatically be selected for you
+7. Pick the scenes you want to include. The ones added to the build settings will automatically be selected for you
 
 8. When you click _Confirm_ a pop up will show up asking you to pick a folder to generate the _Android_ project to. Pick a folder of your liking preferably inside the project root (it can't be the project root itself)
 
@@ -122,6 +123,7 @@ You should have your game running on the phone!
 10. If you ticked _Install build when done?_ make sure you have your phone connected to the computer and that you unlock it to allow ADB to run
 
 ![picture](Screenshots/BuildDone.png)
+
 11. The build process completed. You can run the app on your phone!
 
 **NOTE:** Although the process screenshots show MacOS this process was tested and successfully ran on Windows and Linux as well!
