@@ -128,6 +128,38 @@ You should have your game running on the phone!
 
 **NOTE:** Although the process screenshots show MacOS this process was tested and successfully ran on Windows and Linux as well!
 
+## To make a signed build
+1. Go to Edit -> Project Settings -> Player
+
+2. Open the Publishing Settings tab
+
+If you already have a keystore:
+3. Tick "Use Existing Keystore" and then click "Browse keystore" to fetch it.
+
+4. You have to provide the keystore password to allow Unity to read the key aliases.
+
+5. Pick the correct alias and provide it's password as well
+ ![picture](Screenshots/keystore.png)
+
+6. You're done!
+
+If you don't have a key already:
+3. Tick "Create new keystore..." and then click "Browse Keystore"
+
+4. Now pick the path where the key will be created
+
+5. Now pick a password and write it again to confirm
+
+6. Click the alias dropdown and then chose "Create a new key"
+![picture](Screenshots/pickAlias.png)
+
+7. Fill in all the details and click "Create Key"
+![picture](Screenshots/createAlias.png)
+
+8. Now go back to the alias dropdown and pick the alias you just created
+
+9. You're done!
+
 ## To run the project
 To successfully run the project you need to:
 1. Download and install ASF Wallet app (you can get it on [Aptoide](https://asf-wallet-app-store-foundation.en.aptoide.com/?store_name=asf-store) or [GooglePlay](https://play.google.com/store/apps/details?id=com.asfoundation.wallet))
