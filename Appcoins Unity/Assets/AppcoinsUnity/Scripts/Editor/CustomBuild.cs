@@ -101,16 +101,48 @@ public class CustomBuild
         if(_buildPath != null)
         {
             StateGradleBuild();
-            Build(_buildPath);
-            
-            if(CustomBuild.runAdbInstall)
-            {
-                StateAdbInstall();
-                AdbInstall(_buildPath);
-            }
+            Build(_buildPath, (int retCode) => {
+
+                UnityEngine.Debug.Log("Build finished with retcode " + retCode);
+
+                if (retCode == 0)
+                {
+                    //Check if the user marked the build to be auto installed on the device
+                    if (CustomBuild.runAdbInstall)
+                    {
+                        StateAdbInstall();
+
+                        AdbInstall(_buildPath, (int returnCode) => {
+
+                            UnityEngine.Debug.Log("Build finished with returnCode " + returnCode);
+
+                            if (returnCode == 0)
+                            {
+                                StateBuildDone();
+                            }
+                            else
+                            {
+                                StateBuildFailed("Error installing build (ADB). For more information open ProcessLog.out located in projectRoot/Assets/AppcoinsUnity/Tools");
+                            }
+
+                        });
+
+                    }
+                    else
+                    {
+                        StateBuildDone();
+                    } 
+                }
+                else
+                {
+                    StateBuildFailed("Error building (Gradle). For more information open ProcessLog.out located in projectRoot/Assets/AppcoinsUnity/Tools");
+                }
+
+            });
+        } else {
+            StateBuildFailed("Error building (Unity)");
         }
 
-        StateBuildDone();
     }
 
 #region State Handling
@@ -142,6 +174,13 @@ public class CustomBuild
             EditorUtility.DisplayDialog("Custom Build", "Build Done!", "OK");
     }
 
+    public void StateBuildFailed(string errorMsg)
+    {
+        ChangeStage(BuildStage.IDLE);
+
+        EditorUtility.DisplayDialog("Custom Build", "Build Failed!\n" + errorMsg, "OK");
+    }
+
 #endregion
 
     protected string AndroidCustomBuild(string[] scenesPath)
@@ -161,6 +200,10 @@ public class CustomBuild
     protected string GenericBuild (string[] scenesPath, string target_dir, BuildTarget build_target, BuildOptions build_options)
     {
         string path = this.SelectPath();
+
+        if (path == null || path.Length == 0) {
+            return null;
+        }
 
         string projPath = CustomBuild.GetProjectPath();
 
@@ -214,7 +257,7 @@ public class CustomBuild
         }
     }
 
-    protected void Build(string path) 
+    protected void Build(string path, System.Action<int> onDoneCallback ) 
     {
         this.FixAppPath(ref CustomBuild.gradlePath, "gradle");
 
@@ -232,11 +275,11 @@ public class CustomBuild
             terminal = new Bash();
         }
 
-        terminal.RunCommand(gradleCmd, cmdPath);
+        terminal.RunCommand(gradleCmd, cmdPath, onDoneCallback);
     }
 
     //Runs overriding ADB install process
-    protected void AdbInstall(string path) 
+    protected void AdbInstall(string path, System.Action<int> onDoneCallback) 
     {
         this.FixAppPath(ref CustomBuild.adbPath, "adb");
 
@@ -254,7 +297,7 @@ public class CustomBuild
             terminal = new Bash();
         }
 
-        terminal.RunCommand(adbCmd, cmdPath);
+        terminal.RunCommand(adbCmd, cmdPath, onDoneCallback);
     }
 }
 

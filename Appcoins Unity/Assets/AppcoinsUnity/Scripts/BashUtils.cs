@@ -19,11 +19,12 @@ public abstract class Terminal
         return processInfo;
     }
 
-    public virtual void RunCommand(string cmd, string path) {}
+    public virtual void RunCommand(string cmd, string path, System.Action<int> onDoneCallback) {
+    }
 
-    public void RunTerminalCommand(string terminalPath, string cmd)
+    public void RunTerminalCommand(string terminalPath, string cmd, System.Action<int> onDoneCallback)
     {
-        RunCommand(cmd, "");
+        RunCommand(cmd, "", onDoneCallback);
     }
 }
 
@@ -31,29 +32,29 @@ public class Bash : Terminal
 {
     protected static string TERMINAL_PATH = "/bin/bash";
 
-    protected virtual void RunBashCommand(string cmd, string path) {}
+    protected virtual void RunBashCommand(string cmd, string path, System.Action<int> onDoneCallback) {
+    }
 
-    public override void RunCommand(string cmd, string path)
+    public override void RunCommand(string cmd, string path, System.Action<int> onDoneCallback)
     {
         Bash t;
-
         if(Directory.Exists("/Applications/Utilities/Terminal.app") || Directory.Exists("/Applications/Terminal.app"))
         {
             t = new BashGUI();
-            t.RunBashCommand(cmd, path);
+            t.RunBashCommand(cmd, path,onDoneCallback);
         }
 
         else
         {
             t = new BashCommandLine();
-            t.RunBashCommand(cmd, path);
+            t.RunBashCommand(cmd, path,onDoneCallback);
         }
     }
 }
 
 public class BashCommandLine : Bash
 {
-    protected override void RunBashCommand(string cmd, string path)
+    protected override void RunBashCommand(string cmd, string path, System.Action<int> onDoneCallback)
     {
         UnityEngine.Debug.Log("Cmd is " + cmd);
         UnityEngine.Debug.Log("Path is " + path);
@@ -81,12 +82,28 @@ public class BashCommandLine : Bash
         newProcess.WaitForExit();
         UnityEngine.Debug.Log(strOutput);
         UnityEngine.Debug.Log("Process exited with code " + newProcess.ExitCode + "\n and errors: " + strError);
+
+        onDoneCallback.Invoke(newProcess.ExitCode);
     }
 }
 
 public class BashGUI : Bash
 {
-    protected override void RunBashCommand(string cmd, string path)
+    bool ProcessFailed() {
+        StreamReader reader = new StreamReader(Application.dataPath + "/AppcoinsUnity/Tools/ProcessLog.out");
+        string processLog = reader.ReadToEnd();
+
+        UnityEngine.Debug.Log(processLog);
+
+        bool foundError = processLog.Contains("Failed") ||
+                         processLog.Contains("FAILED") ||
+                         processLog.Contains("ERROR") ||
+                         processLog.Contains("error");
+
+        return foundError;
+    }
+
+    protected override void RunBashCommand(string cmd, string path, System.Action<int> onDoneCallback)
     {
         CreateSHFileToExecuteCommand(cmd, path);
 
@@ -100,16 +117,27 @@ public class BashGUI : Bash
 	    newProcess.StartInfo = processInfo;
 	    newProcess.Start();
 
+        //TODO FIXME this file might not be created ever!
         //For the process to complete we check with, 5s interval, for the existence of ProcessCompleted.out
-        while(!File.Exists(Application.dataPath + "/AppcoinsUnity/Tools/ProcessCompleted.out"))
-        {
+        bool fileExists = File.Exists(Application.dataPath + "/AppcoinsUnity/Tools/ProcessCompleted.out");
+        bool didProcessFail = ProcessFailed();
+        bool condition;
+        do { 
+            fileExists = File.Exists(Application.dataPath + "/AppcoinsUnity/Tools/ProcessCompleted.out");
+            didProcessFail = ProcessFailed();
+            condition = !fileExists && !didProcessFail;
             Thread.Sleep(5000);
         }
+        while (condition);
 
         //Now we can safely kill the process
         if(!newProcess.HasExited)
         {
             newProcess.Kill();
+            int retCode = didProcessFail ? -1 : 0;
+            onDoneCallback.Invoke(retCode);
+        } else {
+            onDoneCallback.Invoke(newProcess.ExitCode);
         }
     }
 
@@ -123,7 +151,8 @@ public class BashGUI : Bash
         //Put terminal as first foreground application
         writer.WriteLine("osascript -e 'activate application \"/Applications/Utilities/Terminal.app\"'");
         writer.WriteLine("cd " + path);
-        writer.WriteLine(cmd);
+        //writer.WriteLine(cmd);
+        writer.WriteLine(cmd + " | tee '" + Application.dataPath + "/AppcoinsUnity/Tools/ProcessLog.out'");
         writer.WriteLine("echo 'done' > '" + Application.dataPath + "/AppcoinsUnity/Tools/ProcessCompleted.out'");
         writer.WriteLine("exit");
         // writer.WriteLine("osascript -e 'tell application \"Terminal\" to close first window'");
@@ -138,7 +167,7 @@ public class CMD : Terminal
     protected static string TERMINAL_PATH = "cmd.exe";
     private static bool NO_GUI = false;
 
-    public override void RunCommand(string cmd, string path)
+    public override void RunCommand(string cmd, string path, System.Action<int> onDoneCallback)
     {
         ProcessStartInfo processInfo = InitializeProcessInfo(TERMINAL_PATH);
         processInfo.CreateNoWindow = NO_GUI;
@@ -159,5 +188,7 @@ public class CMD : Terminal
 
         Process newProcess = Process.Start(processInfo);
         newProcess.WaitForExit();
+
+        onDoneCallback.Invoke(newProcess.ExitCode);
     }
 }
