@@ -152,7 +152,7 @@ public class BashGUI : Bash
         writer.WriteLine("osascript -e 'activate application \"/Applications/Utilities/Terminal.app\"'");
         writer.WriteLine("cd " + path);
         //writer.WriteLine(cmd);
-        writer.WriteLine(cmd + " | tee '" + Application.dataPath + "/AppcoinsUnity/Tools/ProcessLog.out'");
+        writer.WriteLine(cmd + " 2>&1 | tee '" + Application.dataPath + "/AppcoinsUnity/Tools/ProcessLog.out'");
         writer.WriteLine("echo 'done' > '" + Application.dataPath + "/AppcoinsUnity/Tools/ProcessCompleted.out'");
         writer.WriteLine("exit");
         // writer.WriteLine("osascript -e 'tell application \"Terminal\" to close first window'");

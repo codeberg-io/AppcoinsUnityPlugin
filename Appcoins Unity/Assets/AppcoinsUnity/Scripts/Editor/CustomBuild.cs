@@ -283,7 +283,7 @@ public class CustomBuild
     {
         this.FixAppPath(ref CustomBuild.adbPath, "adb");
 
-        string adbCmd = "'" + CustomBuild.adbPath + "adb' install -r './build/outputs/apk/release/" + PlayerSettings.productName + "-release.apk'";
+        string adbCmd = "'" + CustomBuild.adbPath + "adb' -d install -r './build/outputs/apk/release/" + PlayerSettings.productName + "-release.apk'";
         string cmdPath = "'" + path + "/" + PlayerSettings.productName + "'";
 
         Terminal terminal = null;
