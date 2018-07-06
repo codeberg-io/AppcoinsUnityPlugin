@@ -275,7 +275,29 @@ public class CustomBuild
             terminal = new Bash();
         }
 
-        terminal.RunCommand(gradleCmd, cmdPath, onDoneCallback);
+        //If we're not in windows we need to make sure that the gradle file has exec permission
+        //and if not, set them
+        if (SystemInfo.operatingSystemFamily == OperatingSystemFamily.MacOSX ||
+            SystemInfo.operatingSystemFamily == OperatingSystemFamily.Linux)
+        {
+            string chmodCmd = "chmod +x '" + gradlePath + "gradle'";
+
+            terminal.RunCommand(chmodCmd, "", (int retCode) => {
+                if (retCode == 0)
+                {
+                    terminal.RunCommand(gradleCmd, cmdPath, onDoneCallback);
+                }
+                else
+                {
+                    onDoneCallback.Invoke(-1);
+                }
+            });
+
+        }
+        else
+        {
+            terminal.RunCommand(gradleCmd, cmdPath, onDoneCallback);
+        }
     }
 
     //Runs overriding ADB install process
