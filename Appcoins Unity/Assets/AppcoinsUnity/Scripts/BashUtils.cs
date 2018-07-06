@@ -159,6 +159,7 @@ public class BashGUI : Bash
         writer.Close();
 
         File.Delete(Application.dataPath + "/AppcoinsUnity/Tools/ProcessCompleted.out");
+        File.Delete(Application.dataPath + "/AppcoinsUnity/Tools/ProcessCompleted.out");
     }
 }
 
