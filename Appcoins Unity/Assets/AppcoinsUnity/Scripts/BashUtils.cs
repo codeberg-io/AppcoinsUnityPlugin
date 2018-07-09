@@ -170,25 +170,33 @@ public class CMD : Terminal
 
     public override void RunCommand(string cmd, string path, System.Action<int> onDoneCallback)
     {
-        ProcessStartInfo processInfo = InitializeProcessInfo(TERMINAL_PATH);
-        processInfo.CreateNoWindow = NO_GUI;
-        processInfo.RedirectStandardInput = true;
+        Process newProcess = new Process();
+        newProcess.StartInfo = InitializeProcessInfo(TERMINAL_PATH);
+        newProcess.StartInfo.CreateNoWindow = NO_GUI;
+        newProcess.StartInfo.RedirectStandardInput = true;
+        newProcess.StartInfo.RedirectStandardError = true;
 
         if (path != "")
         {
-            processInfo.Arguments = "/c \"cd " + path + " && " + cmd + "\"";
+            newProcess.StartInfo.Arguments = "/c \"cd " + path + " && " + cmd + "\"";
         }
         else
         {
-            processInfo.Arguments = "/c \"" + cmd + "\"";
+            newProcess.StartInfo.Arguments = "/c \"" + cmd + "\"";
         }
 
         // Replace string from bash fromat to cmd format
-        processInfo.Arguments = processInfo.Arguments.Replace("\"", "");
-        processInfo.Arguments = processInfo.Arguments.Replace("'", "\"");
+        newProcess.StartInfo.Arguments = newProcess.StartInfo.Arguments.Replace("\"", "");
+        newProcess.StartInfo.Arguments = newProcess.StartInfo.Arguments.Replace("'", "\"");
 
-        Process newProcess = Process.Start(processInfo);
+        StreamWriter writer = new StreamWriter(Application.dataPath + "/AppcoinsUnity/Tools/ProcessLog.out", false);
+        StreamReader reader = newProcess.StandardError;
+        
+        newProcess.Start();
+        writer.WriteLine(reader.ReadLine());
+
         newProcess.WaitForExit();
+        writer.Close();
 
         onDoneCallback.Invoke(newProcess.ExitCode);
     }
