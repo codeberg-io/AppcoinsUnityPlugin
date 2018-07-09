@@ -9,6 +9,19 @@ using UnityEngine;
 
 public abstract class Terminal
 {
+    protected bool ProcessFailed() {
+        StreamReader reader = new StreamReader(Application.dataPath + "/AppcoinsUnity/Tools/ProcessLog.out");
+        string processLog = reader.ReadToEnd();
+        reader.Close();
+
+        if(processLog.Length != 0)
+        {
+            return true;
+        }
+
+        return false;
+    }
+    
     public ProcessStartInfo InitializeProcessInfo(string terminalPath)
     {
         ProcessStartInfo processInfo = new ProcessStartInfo();
@@ -19,12 +32,12 @@ public abstract class Terminal
         return processInfo;
     }
 
-    public virtual void RunCommand(string cmd, string path, System.Action<int> onDoneCallback) {
+    public virtual void RunCommand(int buildPhase, string cmd, string cmdArgs, string path, System.Action<int> onDoneCallback) {
     }
 
-    public void RunTerminalCommand(string terminalPath, string cmd, System.Action<int> onDoneCallback)
+    public void RunTerminalCommand(int buildPhase, string terminalPath, string cmd, string cmdArgs, System.Action<int> onDoneCallback)
     {
-        RunCommand(cmd, "", onDoneCallback);
+        RunCommand(buildPhase, cmd, cmdArgs, ".", onDoneCallback);
     }
 }
 
@@ -32,29 +45,29 @@ public class Bash : Terminal
 {
     protected static string TERMINAL_PATH = "/bin/bash";
 
-    protected virtual void RunBashCommand(string cmd, string path, System.Action<int> onDoneCallback) {
+    protected virtual void RunBashCommand(int buildPhase, string cmd, string cmdArgs, string path, System.Action<int> onDoneCallback) {
     }
 
-    public override void RunCommand(string cmd, string path, System.Action<int> onDoneCallback)
+    public override void RunCommand(int buildPhase, string cmd, string cmdArgs, string path, System.Action<int> onDoneCallback)
     {
         Bash t;
         if(Directory.Exists("/Applications/Utilities/Terminal.app") || Directory.Exists("/Applications/Terminal.app"))
         {
             t = new BashGUI();
-            t.RunBashCommand(cmd, path,onDoneCallback);
+            t.RunBashCommand(buildPhase, cmd, cmdArgs, path, onDoneCallback);
         }
 
         else
         {
             t = new BashCommandLine();
-            t.RunBashCommand(cmd, path,onDoneCallback);
+            t.RunBashCommand(buildPhase, cmd, cmdArgs, path,onDoneCallback);
         }
     }
 }
 
 public class BashCommandLine : Bash
 {
-    protected override void RunBashCommand(string cmd, string path, System.Action<int> onDoneCallback)
+    protected override void RunBashCommand(int buildPhase, string cmd, string cmdArgs, string path, System.Action<int> onDoneCallback)
     {
         UnityEngine.Debug.Log("Cmd is " + cmd);
         UnityEngine.Debug.Log("Path is " + path);
@@ -63,14 +76,7 @@ public class BashCommandLine : Bash
         processInfo.RedirectStandardOutput = true;
         processInfo.RedirectStandardError = true;
 
-        if (path != "")
-        {
-            processInfo.Arguments = "-c \"cd " + path + " && " + cmd + "\"";
-        }
-        else
-        {
-            processInfo.Arguments = "-c \"" + cmd + "\"";
-        }
+        processInfo.Arguments = "-c \"cd " + path + " && " + cmd + " " + cmdArgs + "\"";
 
         UnityEngine.Debug.Log("process args: " + processInfo.Arguments);
 
@@ -89,23 +95,9 @@ public class BashCommandLine : Bash
 
 public class BashGUI : Bash
 {
-    bool ProcessFailed() {
-        StreamReader reader = new StreamReader(Application.dataPath + "/AppcoinsUnity/Tools/ProcessLog.out");
-        string processLog = reader.ReadToEnd();
-
-        UnityEngine.Debug.Log(processLog);
-
-        bool foundError = processLog.Contains("Failed") ||
-                         processLog.Contains("FAILED") ||
-                         processLog.Contains("ERROR") ||
-                         processLog.Contains("error");
-
-        return foundError;
-    }
-
-    protected override void RunBashCommand(string cmd, string path, System.Action<int> onDoneCallback)
+    protected override void RunBashCommand(int buildPhase, string cmd, string cmdArgs, string path, System.Action<int> onDoneCallback)
     {
-        CreateSHFileToExecuteCommand(cmd, path);
+        CreateSHFileToExecuteCommand(buildPhase, cmd, cmdArgs, path);
 
         ProcessStartInfo processInfo = InitializeProcessInfo(TERMINAL_PATH);
         processInfo.FileName = "/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal";
@@ -120,13 +112,11 @@ public class BashGUI : Bash
         //TODO FIXME this file might not be created ever!
         //For the process to complete we check with, 5s interval, for the existence of ProcessCompleted.out
         bool fileExists = File.Exists(Application.dataPath + "/AppcoinsUnity/Tools/ProcessCompleted.out");
-        bool didProcessFail = ProcessFailed();
         bool condition;
         do { 
             fileExists = File.Exists(Application.dataPath + "/AppcoinsUnity/Tools/ProcessCompleted.out");
-            didProcessFail = ProcessFailed();
-            condition = !fileExists && !didProcessFail;
-            Thread.Sleep(5000);
+            condition = !fileExists;
+            Thread.Sleep(2000);
         }
         while (condition);
 
@@ -134,15 +124,14 @@ public class BashGUI : Bash
         if(!newProcess.HasExited)
         {
             newProcess.Kill();
-            int retCode = didProcessFail ? -1 : 0;
-            onDoneCallback.Invoke(retCode);
-        } else {
-            onDoneCallback.Invoke(newProcess.ExitCode);
         }
+
+        int retCode = ((ProcessFailed() == true) ? -1 : 0);
+        onDoneCallback.Invoke(retCode);
     }
 
     //This creates a bash file that gets executed in the specified path
-    private void CreateSHFileToExecuteCommand(string cmd, string path)
+    private void CreateSHFileToExecuteCommand(int buildPhase, string cmd, string cmdArgs, string path)
     {
         StreamWriter writer = new StreamWriter(Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.sh", false);
 
@@ -152,7 +141,20 @@ public class BashGUI : Bash
         writer.WriteLine("osascript -e 'activate application \"/Applications/Utilities/Terminal.app\"'");
         writer.WriteLine("cd " + path);
         //writer.WriteLine(cmd);
-        writer.WriteLine(cmd + " 2>&1 | tee '" + Application.dataPath + "/AppcoinsUnity/Tools/ProcessLog.out'");
+        if(buildPhase == 2)
+        {
+            writer.WriteLine("if [ \"$(" + cmd + " get-state)\" == \"device\" ]\nthen");
+        }
+
+        // writer.WriteLine(cmd + " " + cmdArgs + " 2> '" + Application.dataPath + "/AppcoinsUnity/Tools/ProcessLog.out' | tee '" + Application.dataPath + "/AppcoinsUnity/Tools/ProcessLog.out'");
+        writer.WriteLine(cmd + " " + cmdArgs + " 2>&1 2>'" + Application.dataPath + "/AppcoinsUnity/Tools/ProcessLog.out'");
+
+        if(buildPhase == 2)
+        {
+            writer.WriteLine("else\necho error: no usb device found > '" + Application.dataPath + "/AppcoinsUnity/Tools/ProcessLog.out'");
+            writer.WriteLine("fi");
+        }
+
         writer.WriteLine("echo 'done' > '" + Application.dataPath + "/AppcoinsUnity/Tools/ProcessCompleted.out'");
         writer.WriteLine("exit");
         // writer.WriteLine("osascript -e 'tell application \"Terminal\" to close first window'");
@@ -168,35 +170,41 @@ public class CMD : Terminal
     protected static string TERMINAL_PATH = "cmd.exe";
     private static bool NO_GUI = false;
 
-    public override void RunCommand(string cmd, string path, System.Action<int> onDoneCallback)
+    public override void RunCommand(int buildPhase, string cmd, string cmdArgs, string path, System.Action<int> onDoneCallback)
     {
-        Process newProcess = new Process();
-        newProcess.StartInfo = InitializeProcessInfo(TERMINAL_PATH);
-        newProcess.StartInfo.CreateNoWindow = NO_GUI;
-        newProcess.StartInfo.RedirectStandardInput = true;
-        newProcess.StartInfo.RedirectStandardError = true;
+        cmd = cmd.Replace("/", "\\");
+        cmdArgs = cmdArgs.Replace("/", "\\");
+        path = path.Replace("/", "\\");
+
+        ProcessStartInfo processInfo = InitializeProcessInfo(TERMINAL_PATH);
+        processInfo.CreateNoWindow = NO_GUI;
+        processInfo.UseShellExecute = true;
 
         if (path != "")
         {
-            newProcess.StartInfo.Arguments = "/c \"cd " + path + " && " + cmd + "\"";
+            processInfo.Arguments = "/c \"cd " + path + " && " + cmd + " " + cmdArgs + "\"";
         }
         else
         {
-            newProcess.StartInfo.Arguments = "/c \"" + cmd + "\"";
+            processInfo.Arguments = "/c \"" + cmd + " " + cmdArgs + "\"";
         }
 
         // Replace string from bash fromat to cmd format
-        newProcess.StartInfo.Arguments = newProcess.StartInfo.Arguments.Replace("\"", "");
-        newProcess.StartInfo.Arguments = newProcess.StartInfo.Arguments.Replace("'", "\"");
+        processInfo.Arguments = processInfo.Arguments.Replace("\"", "");
+        processInfo.Arguments = processInfo.Arguments.Replace("'", "\"");
 
-        StreamWriter writer = new StreamWriter(Application.dataPath + "/AppcoinsUnity/Tools/ProcessLog.out", false);
-        StreamReader reader = newProcess.StandardError;
-        
-        newProcess.Start();
-        writer.WriteLine(reader.ReadLine());
+        Process newProcess = Process.Start(processInfo);
 
-        newProcess.WaitForExit();
-        writer.Close();
+        bool fileExists = File.Exists(Application.dataPath + "/AppcoinsUnity/Tools/ProcessCompleted.out");
+        bool didProcessFail = ProcessFailed();
+        bool condition;
+        do { 
+            fileExists = File.Exists(Application.dataPath + "/AppcoinsUnity/Tools/ProcessCompleted.out");
+            didProcessFail = ProcessFailed();
+            condition = !fileExists && !didProcessFail && !newProcess.HasExited;
+            Thread.Sleep(5000);
+        }
+        while (condition);
 
         onDoneCallback.Invoke(newProcess.ExitCode);
     }
