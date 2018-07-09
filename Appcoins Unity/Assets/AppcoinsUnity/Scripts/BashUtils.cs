@@ -111,7 +111,7 @@ public class BashGUI : Bash
 
         //TODO FIXME this file might not be created ever!
         //For the process to complete we check with, 5s interval, for the existence of ProcessCompleted.out
-        bool fileExists = File.Exists(Application.dataPath + "/AppcoinsUnity/Tools/ProcessCompleted.out");
+        bool fileExists;
         bool condition;
         do { 
             fileExists = File.Exists(Application.dataPath + "/AppcoinsUnity/Tools/ProcessCompleted.out");
@@ -173,8 +173,13 @@ public class CMD : Terminal
     public override void RunCommand(int buildPhase, string cmd, string cmdArgs, string path, System.Action<int> onDoneCallback)
     {
         cmd = cmd.Replace("/", "\\");
+        cmd = cmd.Replace("'", "\"");
         cmdArgs = cmdArgs.Replace("/", "\\");
+        cmdArgs = cmdArgs.Replace("'", "\"");
         path = path.Replace("/", "\\");
+        path = path.Replace("'", "\"");
+
+        CreateBatchFileToExecuteCommand(buildPhase, cmd, cmdArgs, path);
 
         ProcessStartInfo processInfo = InitializeProcessInfo(TERMINAL_PATH);
         processInfo.CreateNoWindow = NO_GUI;
@@ -188,10 +193,10 @@ public class CMD : Terminal
 
         Process newProcess = Process.Start(processInfo);
 
-        bool fileExists = File.Exists(Application.dataPath + "\\AppcoinsUnity\\Tools\\ProcessCompleted.out");
+        bool fileExists;
         bool condition;
         do { 
-            fileExists = File.Exists(Application.dataPath + "\\AppcoinsUnity\\Tools\\sProcessCompleted.out");
+            fileExists = File.Exists(Application.dataPath + "\\AppcoinsUnity\\Tools\\ProcessCompleted.out");
             condition = !fileExists;
             Thread.Sleep(2000);
         }
@@ -217,14 +222,20 @@ public class CMD : Terminal
         {
             writer.WriteLine("set var=error");
             writer.WriteLine("for /f \"tokens=*\" %%a in ('" + cmd + " get-state') do set var=%%a");
-            writer.WriteLine("if \"%var%\" == \"device\" (" + cmd + " " + cmdArgs +")");
+            writer.WriteLine("if \"%var%\" == \"device\" (" + cmd + " " + cmdArgs + " 2>\"" + Application.dataPath + "\\AppcoinsUnity\\Tools\\ProcessLog.out\")");
             writer.WriteLine("if \"%var%\" == \"error\" ( echo error >\"" + Application.dataPath + "\\AppcoinsUnity\\Tools\\ProcessLog.out\"" + ")");
         }
 
         else 
         {
-            writer.WriteLine(cmd + " " + cmdArgs);
+            writer.WriteLine("call " + cmd + " " + cmdArgs + " 2>\"" + Application.dataPath + "\\AppcoinsUnity\\Tools\\ProcessLog.out\"");
         }
+
+        writer.WriteLine("echo done >\"" + Application.dataPath + "\\AppcoinsUnity\\Tools\\ProcessCompleted.out\"");
+        writer.Close();
+
+        File.Delete(Application.dataPath + "/AppcoinsUnity/Tools/ProcessCompleted.out");
+        File.Delete(Application.dataPath + "/AppcoinsUnity/Tools/ProcessCompleted.out");
     }
 
 }
