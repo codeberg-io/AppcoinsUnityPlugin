@@ -116,7 +116,11 @@ You should have your game running on the phone!
 
 7. Pick the scenes you want to include. The ones added to the build settings will automatically be selected for you
 
-8. When you click _Confirm_ a pop up will show up asking you to pick a folder to generate the _Android_ project to. Pick a folder of your liking preferably inside the project root (it can't be the project root itself)
+8. When you click _Confirm_ a pop up will show up asking you to pick a folder to generate the _Android_ project to. Pick a folder of your liking preferably inside the project root (it can't be the project root itself).
+
+**NOTE:** The final build will be located here:
+  FolderYouChoseToBuildTo/ProjectName/build/outputs/apk/
+  in a subfolder called debug or release, depending on build settings)
 
 9. When you pick the folder the build process will start. The normal build process will happen and then the custom build process will kick in opening a terminal window. Unity might seem to be not responding but worry not! This is normal because it's waiting for the terminal processes to finish.
 
