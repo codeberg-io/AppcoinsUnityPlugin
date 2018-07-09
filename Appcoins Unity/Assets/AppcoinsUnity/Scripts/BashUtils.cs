@@ -180,14 +180,7 @@ public class CMD : Terminal
         processInfo.CreateNoWindow = NO_GUI;
         processInfo.UseShellExecute = true;
 
-        if (path != "")
-        {
-            processInfo.Arguments = "/c \"cd " + path + " && " + cmd + " " + cmdArgs + "\"";
-        }
-        else
-        {
-            processInfo.Arguments = "/c \"" + cmd + " " + cmdArgs + "\"";
-        }
+        processInfo.Arguments = "/c '" + Application.dataPath + "\\AppcoinsUnity\\Tools\\BashCommand.bat'";
 
         // Replace string from bash fromat to cmd format
         processInfo.Arguments = processInfo.Arguments.Replace("\"", "");
@@ -195,10 +188,10 @@ public class CMD : Terminal
 
         Process newProcess = Process.Start(processInfo);
 
-        bool fileExists = File.Exists(Application.dataPath + "/AppcoinsUnity/Tools/ProcessCompleted.out");
+        bool fileExists = File.Exists(Application.dataPath + "\\AppcoinsUnity\\Tools\\ProcessCompleted.out");
         bool condition;
         do { 
-            fileExists = File.Exists(Application.dataPath + "/AppcoinsUnity/Tools/ProcessCompleted.out");
+            fileExists = File.Exists(Application.dataPath + "\\AppcoinsUnity\\Tools\\sProcessCompleted.out");
             condition = !fileExists;
             Thread.Sleep(2000);
         }
@@ -216,7 +209,7 @@ public class CMD : Terminal
 
     private void CreateBatchFileToExecuteCommand(int buildPhase, string cmd, string cmdArgs, string path)
     {
-        StreamWriter writer = new StreamWriter(Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.bat", false);
+        StreamWriter writer = new StreamWriter(Application.dataPath + "\\AppcoinsUnity\\Tools\\BashCommand.bat", false);
 
         writer.WriteLine("cd " + path);
 
