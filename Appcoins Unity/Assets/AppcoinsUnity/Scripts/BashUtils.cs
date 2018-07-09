@@ -196,16 +196,42 @@ public class CMD : Terminal
         Process newProcess = Process.Start(processInfo);
 
         bool fileExists = File.Exists(Application.dataPath + "/AppcoinsUnity/Tools/ProcessCompleted.out");
-        bool didProcessFail = ProcessFailed();
         bool condition;
         do { 
             fileExists = File.Exists(Application.dataPath + "/AppcoinsUnity/Tools/ProcessCompleted.out");
-            didProcessFail = ProcessFailed();
-            condition = !fileExists && !didProcessFail && !newProcess.HasExited;
-            Thread.Sleep(5000);
+            condition = !fileExists;
+            Thread.Sleep(2000);
         }
         while (condition);
 
-        onDoneCallback.Invoke(newProcess.ExitCode);
+        //Now we can safely kill the process
+        if(!newProcess.HasExited)
+        {
+            newProcess.Kill();
+        }
+
+        int retCode = ((ProcessFailed() == true) ? -1 : 0);
+        onDoneCallback.Invoke(retCode);
     }
+
+    private void CreateBatchFileToExecuteCommand(int buildPhase, string cmd, string cmdArgs, string path)
+    {
+        StreamWriter writer = new StreamWriter(Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.bat", false);
+
+        writer.WriteLine("cd " + path);
+
+        if(buildPhase == 2)
+        {
+            writer.WriteLine("set var=error");
+            writer.WriteLine("for /f \"tokens=*\" %%a in ('" + cmd + " get-state') do set var=%%a");
+            writer.WriteLine("if \"%var%\" == \"device\" (" + cmd + " " + cmdArgs +")");
+            writer.WriteLine("if \"%var%\" == \"error\" ( echo error >\"" + Application.dataPath + "\\AppcoinsUnity\\Tools\\ProcessLog.out\"" + ")");
+        }
+
+        else 
+        {
+            writer.WriteLine(cmd + " " + cmdArgs);
+        }
+    }
+
 }
