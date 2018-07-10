@@ -80,22 +80,18 @@ public class Bash : Terminal
     public override void RunCommand(int buildPhase, string cmd, string cmdArgs, string path, System.Action<int> onDoneCallback)
     {
         string terminalPath = null;
+        int version = -1;
+        int.TryParse(Application.unityVersion, out version);
 
-        #if UNITY_5
+        if(Directory.Exists("/Applications/Utilities/Terminal.app") && version > 5)
+        {
+            terminalPath = "/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal";
+        }
+
+        else
+        {
             terminalPath = "/bin/bash";
-
-        #else
-            if(Directory.Exists("/Applications/Utilities/Terminal.app"))
-            {
-                terminalPath = "/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal";
-            }
-
-            else
-            {
-                terminalPath = "/bin/bash";
-            }
-
-        #endif
+        }
 
         RunBashCommand(terminalPath, buildPhase, cmd, cmdArgs, path, onDoneCallback);
     }
