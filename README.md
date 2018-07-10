@@ -83,7 +83,13 @@ public class Purchaser : AppcoinsPurchaser {
 ## To build the project
 
 
-Go to the build menu (File -> Build Settings) and click _Player Settings_.
+Go to the build menu (File -> Build Settings)
+1. Check that the build system is set to "Gradle"
+(if the import was done correctly this should've changed automatically).
+
+![picture](Screenshots/buildSystemGradle.png)
+
+Now click _Player Settings_.
 
 On the _Player Settings_ window:
 1. Click the other settings panel
@@ -98,7 +104,7 @@ On the _Player Settings_ window:
 
 You should have your game running on the phone!
 
-**Unity 2018.1.X (and below)**
+**Unity 2018.1.X and below (till Unity 5.X)**
 
 1. Close the _Player Settings_ window
 
