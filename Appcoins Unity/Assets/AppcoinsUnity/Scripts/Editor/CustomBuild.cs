@@ -40,7 +40,8 @@ public class CustomBuild
     public static string adbPath = EditorPrefs.GetString("AndroidSdkRoot") + "/platform-tools/adb";
     public static bool runAdbInstall = false;
     public static bool runAdbRun = false;
-    public static string mainActivityPath = "com.unity3d.player.UnityPlayerActivity";
+    // public static string mainActivityPath = "com.unity3d.player.UnityPlayerActivity";
+    public static string mainActivityPath = ".UnityPlayerActivity";
     public static BuildStage stage;
 
     protected string ANDROID_STRING = "android";
@@ -476,7 +477,8 @@ public class CustomBuildWindow : EditorWindow
         CustomBuild.runAdbInstall = GUI.Toggle(new Rect(5, adbPartHeight, 590, 20), CustomBuild.runAdbInstall, "Install build when done?");
 
         float adbRunPartHeight = adbPartHeight + 20;
-        GUI.Label(new Rect(5, adbRunPartHeight, 590, 40), "Path to the main activity name (com.unity3d.player.UnityPlayerActivity by default)");
+                                                                                    // com.unity3d.player.UnityPlayerActivity
+        GUI.Label(new Rect(5, adbRunPartHeight, 590, 40), "Path to the main activity name (.UnityPlayerActivity by default)");
         adbRunPartHeight += 20;
         CustomBuild.mainActivityPath = GUI.TextField(new Rect(5, adbRunPartHeight, 590, 20), CustomBuild.mainActivityPath);
         adbRunPartHeight += 20;

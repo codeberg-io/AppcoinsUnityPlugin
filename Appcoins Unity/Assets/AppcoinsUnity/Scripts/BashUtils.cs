@@ -43,14 +43,29 @@ public abstract class Terminal
 
 public class Bash : Terminal
 {
-    private void RunBashCommand(string terminalPath, int buildPhase, string cmd, string cmdArgs, string path, System.Action<int> onDoneCallback) {
-        CreateSHFileToExecuteCommand(buildPhase, cmd, cmdArgs, path);
+    private void RunBashCommand(string terminalPath, int buildPhase, string cmd, string cmdArgs, string path, System.Action<int> onDoneCallback) 
+    {
+        bool GUI = false;
 
         ProcessStartInfo processInfo = InitializeProcessInfo(terminalPath);
-        processInfo.FileName = "/bin/bash";
         processInfo.CreateNoWindow = false;
 
-	    processInfo.Arguments = "'" + Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.sh'";
+        if(terminalPath.Equals("/bin/bash"))
+        {
+	        processInfo.Arguments = "-c \"'" + Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.sh'\"";
+        }
+
+        else
+        {
+	        processInfo.Arguments = "'" + Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.sh'";
+            GUI = true;
+        }
+
+        CreateSHFileToExecuteCommand(buildPhase, cmd, cmdArgs, path, GUI);
+
+        Process execScript = Process.Start("/bin/bash", "-c \"chmod +x '" + Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.sh'\"");
+        execScript.WaitForExit();
+
 
 	    Process newProcess = new Process();   
 	    newProcess.StartInfo = processInfo;
@@ -97,7 +112,7 @@ public class Bash : Terminal
     }
 
     //This creates a bash file that gets executed in the specified path
-    protected void CreateSHFileToExecuteCommand(int buildPhase, string cmd, string cmdArgs, string path)
+    protected void CreateSHFileToExecuteCommand(int buildPhase, string cmd, string cmdArgs, string path, bool GUI)
     {
         // Delete all temporary files.
         if(File.Exists(Application.dataPath + "/AppcoinsUnity/Tools/ProcessCompleted.out"))
@@ -125,10 +140,11 @@ public class Bash : Terminal
         writer.WriteLine("#!/bin/sh");
 
         //Put terminal as first foreground application
-        #if UNITY_5
-        #else
-        writer.WriteLine("osascript -e 'activate application \"/Applications/Utilities/Terminal.app\"'");
-        #endif
+        if(GUI)
+        {
+            writer.WriteLine("osascript -e 'activate application \"/Applications/Utilities/Terminal.app\"'");
+        }
+
         writer.WriteLine("cd " + path);
         //writer.WriteLine(cmd);
         if(buildPhase == 2)
