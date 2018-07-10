@@ -133,6 +133,12 @@ public class BashGUI : Bash
     //This creates a bash file that gets executed in the specified path
     private void CreateSHFileToExecuteCommand(int buildPhase, string cmd, string cmdArgs, string path)
     {
+        // Delete all temporary files.
+        File.Delete(Application.dataPath + "/AppcoinsUnity/Tools/ProcessCompleted.out");
+        File.Delete(Application.dataPath + "/AppcoinsUnity/Tools/ProcessLog.out");
+        File.Delete(Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.bat");
+        File.Delete(Application.dataPath + "/Appcoins/Tools/BashCommand.sh");
+
         StreamWriter writer = new StreamWriter(Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.sh", false);
 
         writer.WriteLine("#!/bin/sh");
@@ -159,9 +165,6 @@ public class BashGUI : Bash
         writer.WriteLine("exit");
         // writer.WriteLine("osascript -e 'tell application \"Terminal\" to close first window'");
         writer.Close();
-
-        File.Delete(Application.dataPath + "/AppcoinsUnity/Tools/ProcessCompleted.out");
-        File.Delete(Application.dataPath + "/AppcoinsUnity/Tools/ProcessCompleted.out");
     }
 }
 
@@ -214,6 +217,13 @@ public class CMD : Terminal
 
     private void CreateBatchFileToExecuteCommand(int buildPhase, string cmd, string cmdArgs, string path)
     {
+        // Delete all temporary files.
+        File.Delete(Application.dataPath + "\\AppcoinsUnity\\Tools\\ProcessCompleted.out");
+        File.Delete(Application.dataPath + "\\AppcoinsUnity\\Tools\\ProcessLog.out");
+        File.Delete(Application.dataPath + "\\AppcoinsUnity\\Tools\\BashCommand.bat");
+        File.Delete(Application.dataPath + "\\Appcoins\\Tools\\BashCommand.sh");
+
+
         StreamWriter writer = new StreamWriter(Application.dataPath + "\\AppcoinsUnity\\Tools\\BashCommand.bat", false);
 
         writer.WriteLine("cd " + path);
@@ -233,9 +243,5 @@ public class CMD : Terminal
 
         writer.WriteLine("echo done >\"" + Application.dataPath + "\\AppcoinsUnity\\Tools\\ProcessCompleted.out\"");
         writer.Close();
-
-        File.Delete(Application.dataPath + "/AppcoinsUnity/Tools/ProcessCompleted.out");
-        File.Delete(Application.dataPath + "/AppcoinsUnity/Tools/ProcessCompleted.out");
     }
-
 }
