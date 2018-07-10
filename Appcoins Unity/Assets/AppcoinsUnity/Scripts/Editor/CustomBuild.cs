@@ -214,14 +214,14 @@ public class CustomBuild
 
         this.DeleteIfFolderAlreadyExists(path);
 
-        #if UNITY_5
-            EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTarget.Android);
+        #if UNITY_5_6_OR_NEWER
+            EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Android, BuildTarget.Android);
 
         #else
             EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTarget.Android);
 
         #endif
-        
+
         BuildPipeline.BuildPlayer(scenesPath, path, build_target, build_options);
         return path;
     }
