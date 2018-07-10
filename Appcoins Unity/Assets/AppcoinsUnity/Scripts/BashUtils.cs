@@ -50,8 +50,6 @@ public class Bash : Terminal
         ProcessStartInfo processInfo = InitializeProcessInfo(terminalPath);
         processInfo.CreateNoWindow = false;
 
-        terminalPath = "/bin/bash";
-        processInfo.FileName = "/bin/bash";
         if(terminalPath.Equals("/bin/bash"))
         {
 	        processInfo.Arguments = "-c \"'" + Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.sh'\"";
