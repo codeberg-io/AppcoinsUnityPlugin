@@ -950,19 +950,19 @@ Prefab:
         type: 2}
       propertyPath: products.Array.data[0]
       value: 
-      objectReference: {fileID: 11400000, guid: dc49cd9af8a6f4570bb4e50d1d78c9f5,
+      objectReference: {fileID: 11400000, guid: 2d8decb78e5eb42a2bf32ece9ce4f520,
         type: 2}
     - target: {fileID: 114267058133941440, guid: 53ffe963ba9e4624aac3b31b1619f682,
         type: 2}
       propertyPath: products.Array.data[1]
       value: 
-      objectReference: {fileID: 11400000, guid: afc87680d31234b8c8a4697aac8683b4,
+      objectReference: {fileID: 11400000, guid: 2d4b38bf2790248c6ae386fe7032807e,
         type: 2}
     - target: {fileID: 114267058133941440, guid: 53ffe963ba9e4624aac3b31b1619f682,
         type: 2}
       propertyPath: products.Array.data[2]
       value: 
-      objectReference: {fileID: 11400000, guid: 3f23942b43c424a29b5acbd6b6f4dfa9,
+      objectReference: {fileID: 11400000, guid: 27e9a7773f6fc422aa87eb903f40717f,
         type: 2}
     - target: {fileID: 114267058133941440, guid: 53ffe963ba9e4624aac3b31b1619f682,
         type: 2}
