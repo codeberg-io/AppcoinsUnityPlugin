@@ -81,7 +81,7 @@ public class Bash : Terminal
     {
         string terminalPath = null;
         int version = -1;
-        int.TryParse(Application.unityVersion, out version);
+        int.TryParse(Application.unityVersion.Split('.')[0], out version);
 
         if(Directory.Exists("/Applications/Utilities/Terminal.app") && version > 5)
         {
