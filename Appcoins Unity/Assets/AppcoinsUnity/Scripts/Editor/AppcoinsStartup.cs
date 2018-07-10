@@ -10,11 +10,11 @@ public class Startup
     {
         //Check if the active platform is Android. If it isn't change it
         if (EditorUserBuildSettings.activeBuildTarget != BuildTarget.Android)
-            #if UNITY_5
-                EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTarget.Android);
+            #if UNITY_5_6_OR_NEWER
+                EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Android, BuildTarget.Android);
 
             #else
-                EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Android, BuildTarget.Android);
+                EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTarget.Android);
 
             #endif
 
