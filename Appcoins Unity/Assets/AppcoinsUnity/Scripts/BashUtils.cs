@@ -43,64 +43,11 @@ public abstract class Terminal
 
 public class Bash : Terminal
 {
-    protected static string TERMINAL_PATH = "/bin/bash";
-
-    protected virtual void RunBashCommand(int buildPhase, string cmd, string cmdArgs, string path, System.Action<int> onDoneCallback) {
-    }
-
-    public override void RunCommand(int buildPhase, string cmd, string cmdArgs, string path, System.Action<int> onDoneCallback)
-    {
-        Bash t;
-        if(Directory.Exists("/Applications/Utilities/Terminal.app") || Directory.Exists("/Applications/Terminal.app"))
-        {
-            t = new BashGUI();
-            t.RunBashCommand(buildPhase, cmd, cmdArgs, path, onDoneCallback);
-        }
-
-        else
-        {
-            t = new BashCommandLine();
-            t.RunBashCommand(buildPhase, cmd, cmdArgs, path,onDoneCallback);
-        }
-    }
-}
-
-public class BashCommandLine : Bash
-{
-    protected override void RunBashCommand(int buildPhase, string cmd, string cmdArgs, string path, System.Action<int> onDoneCallback)
-    {
-        UnityEngine.Debug.Log("Cmd is " + cmd);
-        UnityEngine.Debug.Log("Path is " + path);
-
-        ProcessStartInfo processInfo = InitializeProcessInfo(TERMINAL_PATH);
-        processInfo.RedirectStandardOutput = true;
-        processInfo.RedirectStandardError = true;
-
-        processInfo.Arguments = "-c \"cd " + path + " && " + cmd + " " + cmdArgs + "\"";
-
-        UnityEngine.Debug.Log("process args: " + processInfo.Arguments);
-
-        Process newProcess = Process.Start(processInfo);
-
-        string strOutput = newProcess.StandardOutput.ReadToEnd();
-        string strError = newProcess.StandardError.ReadToEnd();
-
-        newProcess.WaitForExit();
-        UnityEngine.Debug.Log(strOutput);
-        UnityEngine.Debug.Log("Process exited with code " + newProcess.ExitCode + "\n and errors: " + strError);
-
-        onDoneCallback.Invoke(newProcess.ExitCode);
-    }
-}
-
-public class BashGUI : Bash
-{
-    protected override void RunBashCommand(int buildPhase, string cmd, string cmdArgs, string path, System.Action<int> onDoneCallback)
-    {
+    private void RunBashCommand(string terminalPath, int buildPhase, string cmd, string cmdArgs, string path, System.Action<int> onDoneCallback) {
         CreateSHFileToExecuteCommand(buildPhase, cmd, cmdArgs, path);
 
-        ProcessStartInfo processInfo = InitializeProcessInfo(TERMINAL_PATH);
-        processInfo.FileName = "/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal";
+        ProcessStartInfo processInfo = InitializeProcessInfo(terminalPath);
+        processInfo.FileName = "/bin/bash";
         processInfo.CreateNoWindow = false;
 
 	    processInfo.Arguments = "'" + Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.sh'";
@@ -130,21 +77,62 @@ public class BashGUI : Bash
         onDoneCallback.Invoke(retCode);
     }
 
+    public override void RunCommand(int buildPhase, string cmd, string cmdArgs, string path, System.Action<int> onDoneCallback)
+    {
+        string terminalPath = null;
+
+        #if UNITY_5
+            terminalPath = "/bin/bash";
+
+        #else
+            if(Directory.Exists("/Applications/Utilities/Terminal.app"))
+            {
+                terminalPath = "/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal";
+            }
+
+            else
+            {
+                terminalPath = "/bin/bash";
+            }
+
+        #endif
+
+        RunBashCommand(terminalPath, buildPhase, cmd, cmdArgs, path, onDoneCallback);
+    }
+
     //This creates a bash file that gets executed in the specified path
-    private void CreateSHFileToExecuteCommand(int buildPhase, string cmd, string cmdArgs, string path)
+    protected void CreateSHFileToExecuteCommand(int buildPhase, string cmd, string cmdArgs, string path)
     {
         // Delete all temporary files.
-        File.Delete(Application.dataPath + "/AppcoinsUnity/Tools/ProcessCompleted.out");
-        File.Delete(Application.dataPath + "/AppcoinsUnity/Tools/ProcessLog.out");
-        File.Delete(Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.bat");
-        File.Delete(Application.dataPath + "/Appcoins/Tools/BashCommand.sh");
+        if(File.Exists(Application.dataPath + "/AppcoinsUnity/Tools/ProcessCompleted.out"))
+        {
+            File.Delete(Application.dataPath + "/AppcoinsUnity/Tools/ProcessCompleted.out");
+        }
+
+        if(File.Exists(Application.dataPath + "/AppcoinsUnity/Tools/ProcessLog.out"))
+        {
+            File.Delete(Application.dataPath + "/AppcoinsUnity/Tools/ProcessLog.out");
+        }
+
+        if(File.Exists(Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.bat"))
+        {
+            File.Delete(Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.bat");
+        }
+
+        if(File.Exists(Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.sh"))
+        {
+            File.Delete(Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.sh");
+        }       
 
         StreamWriter writer = new StreamWriter(Application.dataPath + "/AppcoinsUnity/Tools/BashCommand.sh", false);
 
         writer.WriteLine("#!/bin/sh");
 
         //Put terminal as first foreground application
+        #if UNITY_5
+        #else
         writer.WriteLine("osascript -e 'activate application \"/Applications/Utilities/Terminal.app\"'");
+        #endif
         writer.WriteLine("cd " + path);
         //writer.WriteLine(cmd);
         if(buildPhase == 2)
@@ -218,10 +206,25 @@ public class CMD : Terminal
     private void CreateBatchFileToExecuteCommand(int buildPhase, string cmd, string cmdArgs, string path)
     {
         // Delete all temporary files.
-        File.Delete(Application.dataPath + "\\AppcoinsUnity\\Tools\\ProcessCompleted.out");
-        File.Delete(Application.dataPath + "\\AppcoinsUnity\\Tools\\ProcessLog.out");
-        File.Delete(Application.dataPath + "\\AppcoinsUnity\\Tools\\BashCommand.bat");
-        File.Delete(Application.dataPath + "\\Appcoins\\Tools\\BashCommand.sh");
+        if(File.Exists(Application.dataPath + "\\AppcoinsUnity\\Tools\\ProcessCompleted.out"))
+        {
+            File.Delete(Application.dataPath + "\\AppcoinsUnity\\Tools\\ProcessCompleted.out");
+        }
+
+        if(File.Exists(Application.dataPath + "\\AppcoinsUnity\\Tools\\ProcessLog.out"))
+        {
+            File.Delete(Application.dataPath + "\\AppcoinsUnity\\Tools\\ProcessLog.out");
+        }
+
+        if(File.Exists(Application.dataPath + "\\AppcoinsUnity\\Tools\\BashCommand.bat"))
+        {
+            File.Delete(Application.dataPath + "\\AppcoinsUnity\\Tools\\BashCommand.bat");
+        }
+
+        if(File.Exists(Application.dataPath + "\\AppcoinsUnity\\Tools\\BashCommand.sh"))
+        {
+            File.Delete(Application.dataPath + "\\AppcoinsUnity\\Tools\\BashCommand.sh");
+        }
 
 
         StreamWriter writer = new StreamWriter(Application.dataPath + "\\AppcoinsUnity\\Tools\\BashCommand.bat", false);
