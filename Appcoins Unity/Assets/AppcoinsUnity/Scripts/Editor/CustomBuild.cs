@@ -394,11 +394,11 @@ public class CustomBuildWindow : EditorWindow
         float scenesPartHeight = adbPartHeight + 20;
         GUI.Label(new Rect(5, scenesPartHeight, 590, 40), "Select what scenes you want to export:\n(Only scenes that are in build settings are true by default)");
         float scrollViewLength = scenes.Length * 25f;
-        scenesPartHeight += 25;
-        scrollViewVector = GUI.BeginScrollView(new Rect(5, scenesPartHeight, 590, 330), scrollViewVector, new Rect(0, 0, 590, scrollViewLength));
+        scenesPartHeight += 30;
+        scrollViewVector = GUI.BeginScrollView(new Rect(5, scenesPartHeight, 590, 215), scrollViewVector, new Rect(0, 0, 500, scrollViewLength));
         for (int i = 0; i < scenes.Length; i++)
         {
-            scenes[i].exportScene = GUI.Toggle(new Rect(10, 10 + i * 20, 100, 20), scenes[i].exportScene, scenes[i].scene.name);
+            scenes[i].exportScene = GUI.Toggle(new Rect(10, 10 + i * 20, 500, 20), scenes[i].exportScene, scenes[i].scene.path);
         }
         GUI.EndScrollView();
 
@@ -448,12 +448,15 @@ public class ExportScenes
 
     public void getAllOpenScenes()
     {
-        int sceneCount = UnityEngine.SceneManagement.SceneManager.sceneCount;    
+        var allScenes = EditorBuildSettings.scenes;
+        int sceneCount = allScenes.Length;
+        //        int sceneCount = UnityEngine.SceneManagement.SceneManager.sceneCount;  
         scenes = new SceneToExport[sceneCount];
 
         for(int i = 0; i < sceneCount; i++)
         {
-            UnityEngine.SceneManagement.Scene scene = UnityEngine.SceneManagement.SceneManager.GetSceneAt(i);
+            //UnityEngine.SceneManagement.Scene scene = UnityEngine.SceneManagement.SceneManager.GetSceneAt(i);
+            EditorBuildSettingsScene scene = allScenes[i];
 
             if(scenes[i] == null) 
             {
@@ -461,7 +464,7 @@ public class ExportScenes
             }
 
             scenes[i].scene = scene;
-            scenes[i].exportScene = scene.buildIndex != -1 ? true : false;
+            scenes[i].exportScene = scene.enabled ? true : false;
         }
     }
 
@@ -483,8 +486,8 @@ public class SceneToExport
         set { _exportScene = value; }
     }
 
-    private UnityEngine.SceneManagement.Scene _scene;
-    public UnityEngine.SceneManagement.Scene scene
+    private EditorBuildSettingsScene _scene;
+    public EditorBuildSettingsScene scene
     {
         get { return _scene; }
         set { _scene = value; }
