@@ -103,7 +103,7 @@ public class CustomBuild
             StateGradleBuild();
             Build(_buildPath, (int retCode) => {
 
-                UnityEngine.Debug.Log("Build finished with retcode " + retCode);
+                UnityEngine.Debug.Log("Gradle finished with retcode " + retCode);
 
                 if (retCode == 0)
                 {
@@ -114,7 +114,7 @@ public class CustomBuild
 
                         AdbInstall(_buildPath, (int returnCode) => {
 
-                            UnityEngine.Debug.Log("Build finished with returnCode " + returnCode);
+                            UnityEngine.Debug.Log("adb finished with returnCode " + returnCode);
 
                             if (returnCode == 0)
                             {
@@ -261,7 +261,8 @@ public class CustomBuild
     {
         this.FixAppPath(ref CustomBuild.gradlePath, "gradle");
 
-        string gradleCmd = "'" + gradlePath + "gradle' build";
+        string gradleCmd = "'" + gradlePath + "gradle'";
+        string gradleArgs = "build";
         string cmdPath = "'" + path + "/" + PlayerSettings.productName + "'";
 
         Terminal terminal = null;
@@ -280,12 +281,13 @@ public class CustomBuild
         if (SystemInfo.operatingSystemFamily == OperatingSystemFamily.MacOSX ||
             SystemInfo.operatingSystemFamily == OperatingSystemFamily.Linux)
         {
-            string chmodCmd = "chmod +x '" + gradlePath + "gradle'";
+            string chmodCmd = "chmod";
+            string chmodArgs = "+x '" + gradlePath + "gradle'";
 
-            terminal.RunCommand(chmodCmd, "", (int retCode) => {
+            terminal.RunCommand(0, chmodCmd, chmodArgs, ".", (int retCode) => {
                 if (retCode == 0)
                 {
-                    terminal.RunCommand(gradleCmd, cmdPath, onDoneCallback);
+                    terminal.RunCommand(1, gradleCmd, gradleArgs, cmdPath, onDoneCallback);
                 }
                 else
                 {
@@ -296,7 +298,7 @@ public class CustomBuild
         }
         else
         {
-            terminal.RunCommand(gradleCmd, cmdPath, onDoneCallback);
+            terminal.RunCommand(1, gradleCmd, gradleArgs, cmdPath, onDoneCallback);
         }
     }
 
@@ -305,7 +307,8 @@ public class CustomBuild
     {
         this.FixAppPath(ref CustomBuild.adbPath, "adb");
 
-        string adbCmd = "'" + CustomBuild.adbPath + "adb' -d install -r './build/outputs/apk/release/" + PlayerSettings.productName + "-release.apk'";
+        string adbCmd = "'" + CustomBuild.adbPath + "adb'";
+        string adbArgs = "-d install -r './build/outputs/apk/release/" + PlayerSettings.productName + "-release.apk'";
         string cmdPath = "'" + path + "/" + PlayerSettings.productName + "'";
 
         Terminal terminal = null;
@@ -319,7 +322,7 @@ public class CustomBuild
             terminal = new Bash();
         }
 
-        terminal.RunCommand(adbCmd, cmdPath, onDoneCallback);
+        terminal.RunCommand(2, adbCmd, adbArgs, cmdPath, onDoneCallback);
     }
 }
 

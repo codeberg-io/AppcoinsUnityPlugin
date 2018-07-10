@@ -1,1 +1,13 @@
-Success
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':packageRelease'.
+> Failed to read key test from store "C:\Users\aptoide\Documents\GitHub\AppcoinsUnityPlugin\Appcoins Unity\test.keystore": Keystore was tampered with, or password was incorrect
+
+* Try:
+Run with --stacktrace option to get the stack trace. Run with --info or --debug option to get more log output. Run with --scan to get full insights.
+
+* Get more help at https://help.gradle.org
+
+BUILD FAILED in 38s
