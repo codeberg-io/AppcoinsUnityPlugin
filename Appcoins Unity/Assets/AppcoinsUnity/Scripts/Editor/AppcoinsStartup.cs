@@ -20,6 +20,11 @@ public class Startup
         if (PlayerSettings.applicationIdentifier == DEFAULT_UNITY_PACKAGE_IDENTIFIER)
             PlayerSettings.applicationIdentifier = "com.aptoide.appcoins";
 
+        //Make sure that gradle is the selected build system
+        if (EditorUserBuildSettings.androidBuildSystem != AndroidBuildSystem.Gradle)
+            EditorUserBuildSettings.androidBuildSystem = AndroidBuildSystem.Gradle;      
+
+
         Debug.Log("Successfully integrated Appcoins Unity plugin!");
     }
 }
