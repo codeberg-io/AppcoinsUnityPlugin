@@ -78,11 +78,12 @@ public class CustomBuild
         if (TERMINAL_CHOSEN != null)
         {
             ExportScenes expScenes = new ExportScenes();
-            string[] scenesPath = expScenes.ScenesToString(expScenes.AllScenesToExport());
+            expScenes.AllScenesToExport();
             CustomBuild.continueProcessEvent.RemoveAllListeners();
             CustomBuild.continueProcessEvent.AddListener(
                 delegate
                 {
+                    string[] scenesPath = expScenes.ScenesToString();
                     this.ExportAndBuildCustomBuildTarget(target, scenesPath);
                 }
             );
@@ -416,7 +417,7 @@ public class CustomBuildWindow : EditorWindow
     public Vector2 scrollViewVector = Vector2.zero;
 
     //Create the custom Editor Window
-    public static void CreateExportScenesWindow(SceneToExport[] openScenes)
+    public static void CreateExportScenesWindow(ref SceneToExport[] openScenes)
     {
         CustomBuildWindow.instance = (CustomBuildWindow)EditorWindow.GetWindowWithRect(
             typeof(CustomBuildWindow),
@@ -516,9 +517,9 @@ public class CustomBuildWindow : EditorWindow
 // Get all the loaded scenes and asks the user what scenes he wants to export by 'ExportScenesWindow' class.
 public class ExportScenes
 {
-    private SceneToExport[] scenes;
+    private SceneToExport[] scenes = null;
 
-    public string[] ScenesToString(SceneToExport[] scenes) 
+    public string[] ScenesToString() 
     {
         ArrayList pathScenes = new ArrayList();
 
@@ -526,6 +527,7 @@ public class ExportScenes
         {
             if(scenes[i].exportScene)
             {
+                UnityEngine.Debug.Log(scenes[i].scene.path);
                 pathScenes.Add(scenes[i].scene.path);
             }
         }
@@ -533,10 +535,10 @@ public class ExportScenes
         return (pathScenes.ToArray(typeof(string)) as string[]);
     }
 
-    public SceneToExport[] AllScenesToExport()
+    public void AllScenesToExport()
     {
         this.getAllOpenScenes();
-        return this.SelectScenesToExport();
+        this.SelectScenesToExport();
     } 
 
     public void getAllOpenScenes()
@@ -562,10 +564,9 @@ public class ExportScenes
     }
 
     // Opens ExportScenesWindow window.
-    public SceneToExport[] SelectScenesToExport() 
+    public void SelectScenesToExport() 
     {
-        CustomBuildWindow.CreateExportScenesWindow(scenes);
-        return scenes;
+        CustomBuildWindow.CreateExportScenesWindow(ref scenes);
     }
 }
 
