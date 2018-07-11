@@ -541,12 +541,15 @@ public class ExportScenes
 
     public void getAllOpenScenes()
     {
-        int allScenes = UnityEngine.SceneManagement.SceneManager.sceneCount;
-        scenes = new SceneToExport[allScenes];
+        var allScenes = EditorBuildSettings.scenes;
+        int sceneCount = allScenes.Length;
+        //        int sceneCount = UnityEngine.SceneManagement.SceneManager.sceneCount;  
+        scenes = new SceneToExport[sceneCount];
 
-        for(int i = 0; i < allScenes; i++)
+        for(int i = 0; i < sceneCount; i++)
         {
-            UnityEngine.SceneManagement.Scene scene = UnityEngine.SceneManagement.SceneManager.GetSceneAt(i);
+            //UnityEngine.SceneManagement.Scene scene = UnityEngine.SceneManagement.SceneManager.GetSceneAt(i);
+            EditorBuildSettingsScene scene = allScenes[i];
 
             if(scenes[i] == null) 
             {
@@ -554,7 +557,7 @@ public class ExportScenes
             }
 
             scenes[i].scene = scene;
-            scenes[i].exportScene = scene.isLoaded ? true : false;
+            scenes[i].exportScene = scene.enabled ? true : false;
         }
     }
 
@@ -576,8 +579,8 @@ public class SceneToExport
         set { _exportScene = value; }
     }
 
-    private UnityEngine.SceneManagement.Scene _scene;
-    public UnityEngine.SceneManagement.Scene scene
+    private EditorBuildSettingsScene _scene;
+    public EditorBuildSettingsScene scene
     {
         get { return _scene; }
         set { _scene = value; }
