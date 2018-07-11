@@ -248,7 +248,7 @@ public class CMD : Terminal
             writer.WriteLine("set var=error");
             writer.WriteLine("for /f \"tokens=*\" %%a in ('" + cmd + " get-state') do set var=%%a");
             writer.WriteLine("if \"%var%\" == \"device\" (" + cmd + " " + cmdArgs + " 2>\"" + Application.dataPath + "\\AppcoinsUnity\\Tools\\ProcessLog.out\")");
-            writer.WriteLine("if \"%var%\" == \"error\" ( echo error >\"" + Application.dataPath + "\\AppcoinsUnity\\Tools\\ProcessLog.out\"" + ")");
+            writer.WriteLine("if \"%var%\" == \"error\" ( echo error: no usb device found >\"" + Application.dataPath + "\\AppcoinsUnity\\Tools\\ProcessLog.out\"" + ")");
         }
 
         else 
