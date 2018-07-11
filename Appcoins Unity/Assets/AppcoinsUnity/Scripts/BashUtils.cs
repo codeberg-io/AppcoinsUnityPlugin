@@ -175,11 +175,8 @@ public class CMD : Terminal
 
     public override void RunCommand(int buildPhase, string cmd, string cmdArgs, string path, System.Action<int> onDoneCallback)
     {
-        cmd = cmd.Replace("/", "\\");
         cmd = cmd.Replace("'", "\"");
-        cmdArgs = cmdArgs.Replace("/", "\\");
         cmdArgs = cmdArgs.Replace("'", "\"");
-        path = path.Replace("/", "\\");
         path = path.Replace("'", "\"");
 
         CreateBatchFileToExecuteCommand(buildPhase, cmd, cmdArgs, path);
