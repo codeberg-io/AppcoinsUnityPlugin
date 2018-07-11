@@ -527,7 +527,6 @@ public class ExportScenes
         {
             if(scenes[i].exportScene)
             {
-                UnityEngine.Debug.Log(scenes[i].scene.path);
                 pathScenes.Add(scenes[i].scene.path);
             }
         }
