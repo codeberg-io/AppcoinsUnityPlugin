@@ -19,13 +19,13 @@ public class Purchaser : AppcoinsPurchaser {
 		base.purchaseSuccess (skuid);
 		//purchase is successful release the product
 
-		if(skuid=="dodo"){
+		if(skuid.Equals("dodo")){
 		message.text="Thanks! You bought dodo";
 		}
-		else if(skuid=="monster"){
+		else if(skuid.Equals("monster")){
 		message.text="Thanks! You bought monster drink";
 		}
-		else if(skuid=="chocolate"){
+		else if(skuid.Equals("chocolate")){
 			message.text="Thanks! You bought chocolate";
 		}
 	}

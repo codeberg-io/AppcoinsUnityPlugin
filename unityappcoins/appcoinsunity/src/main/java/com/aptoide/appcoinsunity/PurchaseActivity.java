@@ -39,8 +39,10 @@ public class PurchaseActivity extends Activity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        String appcoinsPrefabName = getResources().getString(R.string.APPCOINS_PREFAB);
 
         Log.d(TAG, "onActivityResult called");
+        Log.d(TAG, appcoinsPrefabName);
 
         if (Application.appCoinsSdk.onActivityResult(requestCode, requestCode, data)) {
             Application.appCoinsSdk.getCurrentPayment()
@@ -53,14 +55,14 @@ public class PurchaseActivity extends Activity {
 
                             Log.d(TAG, "AppcoinsUnity::purchaseSuccess! skuid " + skuId);
 
-                            UnityPlayer.UnitySendMessage("AppcoinsUnity","purchaseSuccess",skuId);
+                            UnityPlayer.UnitySendMessage(appcoinsPrefabName,"purchaseSuccess",skuId);
                         }
                         else{
                             String skuId = paymentDetails.getSkuId();
 
                             Log.d(TAG, "AppcoinsUnity::purchaseFailure! skuid " + skuId);
 
-                            UnityPlayer.UnitySendMessage("AppcoinsUnity","purchaseFailure",skuId);
+                            UnityPlayer.UnitySendMessage(appcoinsPrefabName,"purchaseFailure",skuId);
                         }
                         setResult(resultCode,data);
                         finish();

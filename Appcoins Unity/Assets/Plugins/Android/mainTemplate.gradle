@@ -71,6 +71,7 @@ android {
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-unity.txt'
       resValue "bool", "APPCOINS_ENABLE_POA", "true"
       resValue "bool", "APPCOINS_ENABLE_DEBUG", "true"
+      resValue "string", "APPCOINS_PREFAB", "AppcoinsUnity"
 
       **SIGNCONFIG**
     }
@@ -81,5 +82,4 @@ android {
   }
 
 } 
-
 
