@@ -260,7 +260,7 @@ public class CMD : Terminal
 
         if(buildPhase != 0 && debugMode)
         {
-            writer.WriteLine("@echo off\necho Press enter to continue...\ncls\ncall rake\npause");
+            writer.WriteLine("set /p DUMMY=Press ENTER to continue...");
         }
 
         writer.WriteLine("echo done >\"" + Application.dataPath + "\\AppcoinsUnity\\Tools\\ProcessCompleted.out\"");
