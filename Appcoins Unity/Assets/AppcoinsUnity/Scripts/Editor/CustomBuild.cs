@@ -40,6 +40,7 @@ public class CustomBuild
     public static string adbPath = EditorPrefs.GetString("AndroidSdkRoot") + "/platform-tools/adb";
     public static bool runAdbInstall = false;
     public static bool runAdbRun = false;
+    public static bool debugMode = false;
     // public static string mainActivityPath = "com.unity3d.player.UnityPlayerActivity";
     public static string mainActivityPath = ".UnityPlayerActivity";
     public static BuildStage stage;
@@ -321,6 +322,11 @@ public class CustomBuild
         string gradleArgs = "build";
         string cmdPath = "'" + path + "/" + PlayerSettings.productName + "'";
 
+        if(CustomBuild.debugMode)
+        {
+            gradleArgs += " --debug";
+        }
+
         Terminal terminal = null;
         if (TERMINAL_CHOSEN == CMD_LOCATION)
         {
@@ -340,11 +346,11 @@ public class CustomBuild
             string chmodCmd = "chmod";
             string chmodArgs = "+x '" + gradlePath + "gradle'";
 
-            terminal.RunCommand(0, chmodCmd, chmodArgs, ".", (int retCode) =>
+            terminal.RunCommand(0, chmodCmd, chmodArgs, ".", false, (int retCode) =>
             {
                 if (retCode == 0)
                 {
-                    terminal.RunCommand(1, gradleCmd, gradleArgs, cmdPath, onDoneCallback);
+                    terminal.RunCommand(1, gradleCmd, gradleArgs, cmdPath, CustomBuild.debugMode, onDoneCallback);
                 }
                 else
                 {
@@ -355,7 +361,7 @@ public class CustomBuild
         }
         else
         {
-            terminal.RunCommand(1, gradleCmd, gradleArgs, cmdPath, onDoneCallback);
+            terminal.RunCommand(1, gradleCmd, gradleArgs, cmdPath, CustomBuild.debugMode, onDoneCallback);
         }
     }
 
@@ -379,7 +385,7 @@ public class CustomBuild
             terminal = new Bash();
         }
 
-        terminal.RunCommand(2, adbCmd, adbArgs, cmdPath, onDoneCallback);
+        terminal.RunCommand(2, adbCmd, adbArgs, cmdPath, false, onDoneCallback);
     }
 
     protected void AdbRun(string path, System.Action<int> onDoneCallback)
@@ -405,7 +411,7 @@ public class CustomBuild
             terminal = new Bash();
         }
 
-        terminal.RunCommand(2, adbCmd, adbArgs, cmdPath, onDoneCallback);
+        terminal.RunCommand(2, adbCmd, adbArgs, cmdPath, false, onDoneCallback);
     }
 }
 
@@ -485,7 +491,10 @@ public class CustomBuildWindow : EditorWindow
         adbRunPartHeight += 20;
         CustomBuild.runAdbRun = GUI.Toggle(new Rect(5, adbRunPartHeight, 590, 20), CustomBuild.runAdbRun, "Run build when done?"); 
 
-        float scenesPartHeight = adbRunPartHeight + 20;
+        float debugModeHeight = adbRunPartHeight + 20;
+        CustomBuild.debugMode = GUI.Toggle(new Rect(5, debugModeHeight, 590, 20), CustomBuild.debugMode, "Run gradle in debug mode? This will not end gradle terminal automatically.");
+
+        float scenesPartHeight = debugModeHeight + 20;
         GUI.Label(new Rect(5, scenesPartHeight, 590, 40), "Select what scenes you want to export:\n(Only scenes that are in build settings are true by default)");
         float scrollViewLength = scenes.Length * 25f;
         scenesPartHeight += 30;
