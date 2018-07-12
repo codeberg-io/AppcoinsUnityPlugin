@@ -13,6 +13,9 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            resValue "bool", "APPCOINS_ENABLE_POA", "false"
+            resValue "bool", "APPCOINS_ENABLE_DEBUG", "false"
+            resValue "string", "APPCOINS_PREFAB", "AppcoinsUnity"
         }
     }
     compileOptions {
@@ -24,6 +27,12 @@ android {
 
 dependencies {
     provided files('./libs/UnityPlayer.jar')
-    api 'com.asfoundation:appcoins:0.3.1a'
+    api 'com.asfoundation:appcoins:0.3.6a'
 }
 
+task copyAarToUnity {
+    copy {
+        from 'build/outputs/aar/appcoinsunity-release.aar'
+        into "../../Appcoins Unity/Assets/Plugins/Android"
+    }
+}
