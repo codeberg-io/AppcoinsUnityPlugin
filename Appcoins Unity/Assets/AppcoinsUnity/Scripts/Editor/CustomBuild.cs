@@ -22,7 +22,7 @@ public class CustomBuildMenuItem : EditorWindow
     [MenuItem("Custom Build/KMP")]
     public static void something()
     {
-        int i = KMP.Matcher("aabbaaaaaaaaaaabbbbba", "bbbbb");
+        int i = KMP.Matcher("abbaaaaaaaaaaaabbbbb", "bbb");
         UnityEngine.Debug.Log(i);
     }
 }

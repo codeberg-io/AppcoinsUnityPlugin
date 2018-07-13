@@ -53,7 +53,7 @@ public class KMP
     {
         UnityEngine.Debug.Log("Prefix)");
         int[] backArray = new int[prefix.Length];
-        backArray[0] = 0;
+        backArray[0] = -1;
 
         int i = -1;
 
@@ -101,6 +101,6 @@ public class KMP
             }
         }
 
-        return (q - prefix.Length);
+        return (q - prefix.Length + 1);
     }
 }
