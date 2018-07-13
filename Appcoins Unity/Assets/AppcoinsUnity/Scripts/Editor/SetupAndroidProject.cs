@@ -1,4 +1,5 @@
 using UnityEditor;
+using UnityEngine;
 using System;
 using System.Collections;
 using System.IO;
@@ -28,15 +29,15 @@ class SetupAndroidProject
             {
                 if(line.Contains(tagToSerach))
                 {
-                    while(line[numberOfTabs].IsWhitepace())
+                    while(Char.IsWhiteSpace(line[numberOfTabs]))
                     {
                         numberOfTabs++;
                     }
 
                     // Check for the start of the 'tagToSearch' string
-                    int startIndex = 
+                    int startIndex = 0;
 
-                    fileLines.Add(SetupAndroidManifest.lineToAdd);
+                    fileLines.Add(SetupAndroidProject.lineToAdd);
 
                 }
 
@@ -75,11 +76,12 @@ public class KMP
 
     public static int Matcher(string text, string prefix)
     {
-        int backArray = KMP.Prefix(prefix);
+        int[] backArray = KMP.Prefix(prefix);
 
+        int q = 0;
         int i = -1;
 
-        for(int q = 0; q < text.Length; q++)
+        for(; q < text.Length; q++)
         {
             while(i >= 0 && prefix[i + 1] != text[q])
             {
@@ -93,8 +95,10 @@ public class KMP
 
             if(i == (prefix.Length - 1))
             {
-                return (q - prefix.Length - 1);
+                break;
             }
         }
+
+        return (q - prefix.Length - 1);
     }
 }
