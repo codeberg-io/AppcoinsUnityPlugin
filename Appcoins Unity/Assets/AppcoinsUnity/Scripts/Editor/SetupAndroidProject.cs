@@ -51,6 +51,7 @@ public class KMP
 {
     public static int[] Prefix(string prefix)
     {
+        UnityEngine.Debug.Log("Prefix)");
         int[] backArray = new int[prefix.Length];
         backArray[0] = 0;
 
@@ -76,6 +77,7 @@ public class KMP
 
     public static int Matcher(string text, string prefix)
     {
+        UnityEngine.Debug.Log("Matcher");
         int[] backArray = KMP.Prefix(prefix);
 
         int q = 0;
@@ -99,6 +101,6 @@ public class KMP
             }
         }
 
-        return (q - prefix.Length - 1);
+        return (q - prefix.Length);
     }
 }
