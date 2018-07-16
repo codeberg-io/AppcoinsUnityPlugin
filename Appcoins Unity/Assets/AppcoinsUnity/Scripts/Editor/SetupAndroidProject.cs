@@ -8,8 +8,11 @@ using System.IO;
 class SetupAndroidProject
 {
     private static bool didSetAndroidProjectOccured = false;
+    private static string appcoinsMainTemplate = Application.dataPath + "/AppcoinsUnity/Plugins/Android/MainTemplate.gradle";
+    private static string mainTemplateLocatino = Application.dataPath + "/Plugins/Android/MainTemplate.gradle";
+    private static string appcoinsManifestLocation = Application.dataPath + "/AppcoinsUnity/Plugins/Android/AndroidManifest.xml";
     private static string manifestLocation = Application.dataPath + "/Plugins/Android/AndroidManifest.xml";
-    private static string tagToSerach = "</application>";
+    private static string[] tagToSearch = {"<application>", "</application>"};
     private static string lineToAdd = "<activity android:name=\"com.aptoide.appcoinsunity.PurchaseActivity\" " +
                                       "android:label=\"@string/app_name\" " + 
                                       "android:theme=\"@android:style/Theme.Translucent.NoTitleBar\" />";
@@ -22,28 +25,84 @@ class SetupAndroidProject
             // Open file and check for the 'activity' tag
             StreamReader fileReader = new StreamReader(manifestLocation);
             ArrayList fileLines = new ArrayList();
-            int numberOfTabs = 0;
+            int[] tagLines = {-1, -1};
+            int linesNumberIndex = 0;
+            int tagLinesIndex = 0;  // tagToSearch index
             string line;
 
             while((line = fileReader.ReadLine()) != null)
             {
-                if(line.Contains(tagToSerach))
+                if(line.Contains(tagToSearch[tagLinesIndex]))
                 {
-                    while(Char.IsWhiteSpace(line[numberOfTabs]))
+                    tagLines[tagLinesIndex] = linesNumberIndex;
+
+                    if(tagLinesIndex == 1)
                     {
-                        numberOfTabs++;
+                        // Check for the start of the 'tagToSearch' string (Assume startIndex is the number of tabs)
+                        int startIndex = KMP.Matcher(line, tagToSearch[1]);
+                        string newLine = line.Substring(0, startIndex);
+                        newLine = string.Concat(" ", newLine);
+                        newLine = string.Concat(newLine, lineToAdd);
+                        fileLines.Add(newLine);
+
+                        string tabs = "";
+                        for(int i = 0; i < startIndex; i++)
+                        {
+                            tabs = string.Concat(" ", tabs);
+                        }
+
+                        fileLines.Add(string.Concat(tabs, line.Substring(startIndex)));
                     }
 
-                    // Check for the start of the 'tagToSearch' string
-                    int startIndex = 0;
-
-                    fileLines.Add(SetupAndroidProject.lineToAdd);
-
+                    tagLinesIndex++;
                 }
 
+                linesNumberIndex++;
                 fileLines.Add(line);
             }
+
+            if(tagLines[0] > -1 && tagLines[1] > -1)
+            {
+                
+            }
         }
+
+        else
+        {
+            File.Copy(appcoinsManifestLocation, manifestLocation);
+        }
+    }
+
+    public static void SetupMainTemplate()
+    {
+        string[] delimiters = {"\n"};
+        string[] allLines = readFileToStringArray(appcoinsMainTemplate, delimiters);
+
+        for(int i = 0; i < allLines.Length; i++)
+        {
+            allLines[i] = allLines[i].Trim();
+        }
+
+        // Search(allLines);
+    }
+
+    private static string[] readFileToStringArray(string pathToFile, string[] delimiters)
+    {
+        StreamReader fileReader = new StreamReader(pathToFile);
+        return fileReader.ReadToEnd().Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
+    }
+
+    private string[] OverrideStrings(string[] allLines)
+    {
+        string line;
+
+        for(int i = 0; i < allLines.Length; i++)
+        {
+            // string word = getWord(line);
+            // bool isContainer = CheckContainer(line);
+        }
+
+        return allLines;
     }
 }
 
@@ -51,7 +110,6 @@ public class KMP
 {
     public static int[] Prefix(string prefix)
     {
-        UnityEngine.Debug.Log("Prefix)");
         int[] backArray = new int[prefix.Length];
         backArray[0] = -1;
 
@@ -77,7 +135,6 @@ public class KMP
 
     public static int Matcher(string text, string prefix)
     {
-        UnityEngine.Debug.Log("Matcher");
         int[] backArray = KMP.Prefix(prefix);
 
         int q = 0;

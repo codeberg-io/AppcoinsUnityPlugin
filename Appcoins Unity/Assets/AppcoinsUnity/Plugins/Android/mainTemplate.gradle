@@ -1,0 +1,56 @@
+buildscript {
+repositories {
+jcenter()
+google()
+}
+
+dependencies {
+classpath 'com.android.tools.build:gradle:3.0.1'
+}
+}
+
+allprojects {
+repositories {
+google()
+jcenter()
+maven { url "https://dl.bintray.com/asf/asf" }
+flatDir {
+dirs 'libs'
+}
+}
+}
+
+dependencies {
+compile fileTree(dir: 'libs', include: ['*.jar'])
+api 'com.asfoundation:appcoins:0.3.6a'
+implementation(name: 'appcoinsunity-release', ext:'aar')
+}
+
+android {
+
+defaultConfig {
+ndk {
+abiFilters 'armeabi-v7a', 'x86'
+}
+multiDexEnabled true
+compileOptions {
+sourceCompatibility 1.8
+targetCompatibility 1.8
+}
+}
+
+buildTypes {
+debug {
+resValue "bool", "APPCOINS_ENABLE_POA", "true"
+resValue "bool", "APPCOINS_ENABLE_DEBUG", "true"
+resValue "string", "APPCOINS_PREFAB", "AppcoinsUnity"
+}
+release {
+resValue "bool", "APPCOINS_ENABLE_POA", "true"
+resValue "bool", "APPCOINS_ENABLE_DEBUG", "true"
+resValue "string", "APPCOINS_PREFAB", "AppcoinsUnity"
+}
+}
+
+} 
+
