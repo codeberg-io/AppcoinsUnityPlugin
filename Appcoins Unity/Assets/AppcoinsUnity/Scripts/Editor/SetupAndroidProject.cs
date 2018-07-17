@@ -9,7 +9,8 @@ class SetupAndroidProject
 {
     private static bool didSetAndroidProjectOccured = false;
     private static string appcoinsMainTemplate = Application.dataPath + "/AppcoinsUnity/Plugins/Android/MainTemplate.gradle";
-    private static string mainTemplateLocatino = Application.dataPath + "/Plugins/Android/MainTemplate.gradle";
+    private static string currentMainTemplate = Application.dataPath + "/Plugins/Android/mainTemplate.gradle";
+    private static string mainTemplateLocation = Application.dataPath + "/Plugins/Android/MainTemplate.gradle";
     private static string appcoinsManifestLocation = Application.dataPath + "/AppcoinsUnity/Plugins/Android/AndroidManifest.xml";
     private static string manifestLocation = Application.dataPath + "/Plugins/Android/AndroidManifest.xml";
     private static string[] tagToSearch = {"<application>", "</application>"};
@@ -73,39 +74,140 @@ class SetupAndroidProject
         }
     }
 
+    // Merge current mainTemplate.gradle with appcoins mainTemplate.gradle
     public static void SetupMainTemplate()
     {
         string[] delimiters = {"\n"};
-        string[] allLines = readFileToStringArray(appcoinsMainTemplate, delimiters);
 
-        for(int i = 0; i < allLines.Length; i++)
+        // Get both files to string arrays (each index is a line of the file)
+        ArrayList formattedCurrentMainTemplate; = readFileToStringArray(currentMainTemplate, delimiters, StringSplitOptions.None);
+        ArrayList formattedAppcoinsMainTemplateLines = readFileToStringArray(appcoinsMainTemplate, delimiters, StringSplitOptions.RemoveEmptyEntries);
+        ArrayList allCurrentMainTemplateLines = new ArrayList();
+        ArrayList allAppcoinsMainTemplateLines = new ArrayList();
+
+        int length = allAppcoinsMainTemplateLines.Length > allCurrentMainTemplateLines.Length ? allAppcoinsMainTemplateLines : allCurrentMainTemplateLines;
+
+        // Get new ArrayLists to represent each files without any whitespaces
+        for(int i = 0; i < length; i++)
         {
-            allLines[i] = allLines[i].Trim();
+            if(i < allAppcoinsMainTemplateLines.Length)
+            {
+                allAppcoinsMainTemplateLines.Add(formattedAppcoinsMainTemplateLines[i].Trim());
+            }
+
+            if(i < formattedCurrentMainTemplate.Length)
+            {
+                allCurrentMainTemplateLines.Add(formattedCurrentMainTemplate[i].Trim());
+            }
         }
 
-        // Search(allLines);
+        // Search(allAppcoinsMainTemplateLines);
     }
 
-    private static string[] readFileToStringArray(string pathToFile, string[] delimiters)
+    // Convert a file to an ArrayList. Each index corrensponds to a line of the file.
+    private static ArrayList readFileToStringArray(string pathToFile, string[] delimiters, StringSplitOptions options)
     {
+        ArrayList stringArray;
         StreamReader fileReader = new StreamReader(pathToFile);
-        return fileReader.ReadToEnd().Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
+        return new stringArray(fileReader.ReadToEnd().Split(delimiters, options));
     }
 
-    private string[] OverrideStrings(string[] allLines)
+    private static string[] OverrideFile(string[] mergeFileLines, string[] outFileLines)
     {
         string line;
 
-        for(int i = 0; i < allLines.Length; i++)
+        for(int i = 0; i < mergeFileLines.Length; i++)
         {
-            // string word = getWord(line);
-            // bool isContainer = CheckContainer(line);
+            line = mergeFileLines[i];
+            bool isContainer = CheckContainer(line);
+            string word = getWord();
+
+        }
+    }
+
+    private static void Search(ArrayList outFileLines, int lastContainerIndex, ArrayList mergeFileLines, int indexMergeFile)
+    {
+        if(indexMergeFile == mergeFileLines.Length)
+        {
+            return;
         }
 
-        return allLines;
+        string word = GetWord(mergeFileLines[indexMergeFile]);
+        bool isContainer = CheckContainer(mergeFileLines[indexMergeFile]);
+        int outFileIndex;
+
+        if((outFileIndex = Array.FindIndex(outFileLines, lastContainerIndex, element => element.Contains(word))) != -1)
+        {
+            if(isContainer)
+            {
+                lastContainerIndex = outFileIndex; 
+                Search(outFileLines, lastContainerIndex, mergeFileLines, ++indexMergeFile);
+            }
+
+            else
+            {
+                Search(outFileLines, lastContainerIndex, mergeFileLines, ++indexMergeFile);
+            }
+        }
+
+        else
+        {
+            if(isContainer)
+            {
+                CopyLines(outFileLines, lastContainerIndex, mergeFileLines, indexMergeFile, isContainer);
+            }
+
+            else
+            {
+                CopyLines(outFileLines, lastContainerIndex, mergeFileLines, indexMergeFile, isContainer);
+            }
+        }
+    }
+
+    private static void CopyLines(ArrayList outFileLines, int lastContainerIndex ,ArrayList mergeFileLines, int indexMergeFile, bool isContainer)
+    {
+        int innerContainer = 0;
+
+        do
+        {
+            string line = mergeFileLines[indexMergeFile];
+
+            if(line.Contains("{"))
+            {
+                innerContainer++;
+            }
+
+            outFileLines.Insert(lastContainerIndex + 1, mergeFileLines[indexMergeFile]);
+        }
+    }
+
+    private static GetWord(string line)
+    {
+        int wordLength = 0;
+
+        foreach(char letter in line)
+        {
+            if(Char.IsLetter(letter))
+            {
+                wordLength++;
+            }
+
+            else
+            {
+                break;
+            }
+        }
+
+        return line.Substring(0, wordLength);
+    }
+
+    private static void CheckContainer(string line)
+    {
+        return line.Contains("{") ? true : false;
     }
 }
 
+// KMP string matcher
 public class KMP
 {
     public static int[] Prefix(string prefix)
