@@ -13,66 +13,7 @@ class SetupAndroidProject
     private static string mainTemplateLocation = Application.dataPath + "/Plugins/Android/MainTemplate.gradle";
     private static string appcoinsManifestLocation = Application.dataPath + "/AppcoinsUnity/Plugins/Android/AndroidManifest.xml";
     private static string manifestLocation = Application.dataPath + "/Plugins/Android/AndroidManifest.xml";
-    private static string[] tagToSearch = {"<application>", "</application>"};
-    private static string lineToAdd = "<activity android:name=\"com.aptoide.appcoinsunity.PurchaseActivity\" " +
-                                      "android:label=\"@string/app_name\" " + 
-                                      "android:theme=\"@android:style/Theme.Translucent.NoTitleBar\" />";
-
-    public static void SetupAndroidManifest()
-    {
-        // Check if [Path-to-Unity-Project]/Assets/Plugins/Android/AndroidManifest exists
-        if(File.Exists(SetupAndroidProject.manifestLocation))
-        {
-            // Open file and check for the 'activity' tag
-            StreamReader fileReader = new StreamReader(manifestLocation);
-            ArrayList fileLines = new ArrayList();
-            int[] tagLines = {-1, -1};
-            int linesNumberIndex = 0;
-            int tagLinesIndex = 0;  // tagToSearch index
-            string line;
-
-            while((line = fileReader.ReadLine()) != null)
-            {
-                if(line.Contains(tagToSearch[tagLinesIndex]))
-                {
-                    tagLines[tagLinesIndex] = linesNumberIndex;
-
-                    if(tagLinesIndex == 1)
-                    {
-                        // Check for the start of the 'tagToSearch' string (Assume startIndex is the number of tabs)
-                        int startIndex = KMP.Matcher(line, tagToSearch[1]);
-                        string newLine = line.Substring(0, startIndex);
-                        newLine = string.Concat(" ", newLine);
-                        newLine = string.Concat(newLine, lineToAdd);
-                        fileLines.Add(newLine);
-
-                        string tabs = "";
-                        for(int i = 0; i < startIndex; i++)
-                        {
-                            tabs = string.Concat(" ", tabs);
-                        }
-
-                        fileLines.Add(string.Concat(tabs, line.Substring(startIndex)));
-                    }
-
-                    tagLinesIndex++;
-                }
-
-                linesNumberIndex++;
-                fileLines.Add(line);
-            }
-
-            if(tagLines[0] > -1 && tagLines[1] > -1)
-            {
-                
-            }
-        }
-
-        else
-        {
-            File.Copy(appcoinsManifestLocation, manifestLocation);
-        }
-    }
+    private static ArrayList formattedAppcoinsMainTemplate;
 
     // Merge current mainTemplate.gradle with appcoins mainTemplate.gradle
     public static void SetupMainTemplate()
@@ -80,108 +21,152 @@ class SetupAndroidProject
         string[] delimiters = {"\n"};
 
         // Get both files to string arrays (each index is a line of the file)
-        ArrayList formattedCurrentMainTemplate; = readFileToStringArray(currentMainTemplate, delimiters, StringSplitOptions.None);
-        ArrayList formattedAppcoinsMainTemplateLines = readFileToStringArray(appcoinsMainTemplate, delimiters, StringSplitOptions.RemoveEmptyEntries);
+        ArrayList formattedCurrentMainTemplate = readFileToStringArray(currentMainTemplate, delimiters, StringSplitOptions.None);
+        formattedAppcoinsMainTemplate = readFileToStringArray(appcoinsMainTemplate, delimiters, StringSplitOptions.RemoveEmptyEntries);
         ArrayList allCurrentMainTemplateLines = new ArrayList();
         ArrayList allAppcoinsMainTemplateLines = new ArrayList();
 
-        int length = allAppcoinsMainTemplateLines.Length > allCurrentMainTemplateLines.Length ? allAppcoinsMainTemplateLines : allCurrentMainTemplateLines;
+        int length = formattedAppcoinsMainTemplate.Count > formattedCurrentMainTemplate.Count ? formattedAppcoinsMainTemplate.Count : formattedCurrentMainTemplate.Count;
 
         // Get new ArrayLists to represent each files without any whitespaces
         for(int i = 0; i < length; i++)
         {
-            if(i < allAppcoinsMainTemplateLines.Length)
+            if(i < formattedAppcoinsMainTemplate.Count)
             {
-                allAppcoinsMainTemplateLines.Add(formattedAppcoinsMainTemplateLines[i].Trim());
+                allAppcoinsMainTemplateLines.Add(((string) formattedAppcoinsMainTemplate[i]).Trim());
             }
 
-            if(i < formattedCurrentMainTemplate.Length)
+            if(i < formattedCurrentMainTemplate.Count)
             {
-                allCurrentMainTemplateLines.Add(formattedCurrentMainTemplate[i].Trim());
+                allCurrentMainTemplateLines.Add(((string) formattedCurrentMainTemplate[i]).Trim());
             }
         }
 
-        // Search(allAppcoinsMainTemplateLines);
+        Search(allCurrentMainTemplateLines, new Queue(), allAppcoinsMainTemplateLines, 0);
+
+        StreamWriter fileWriter = new StreamWriter(currentMainTemplate, false);
+
+        foreach(string line in allCurrentMainTemplateLines)
+        {
+            fileWriter.WriteLine(line);
+        }
+
+        fileWriter.Close();
     }
 
     // Convert a file to an ArrayList. Each index corrensponds to a line of the file.
     private static ArrayList readFileToStringArray(string pathToFile, string[] delimiters, StringSplitOptions options)
     {
-        ArrayList stringArray;
         StreamReader fileReader = new StreamReader(pathToFile);
-        return new stringArray(fileReader.ReadToEnd().Split(delimiters, options));
+        ArrayList array = new ArrayList(fileReader.ReadToEnd().Split(delimiters, options));
+        fileReader.Close();
+        return array;
     }
 
-    private static string[] OverrideFile(string[] mergeFileLines, string[] outFileLines)
+    // Recursive function to check if some lines of 'mergeFileLines' does not exist in 'outFileLines' array.
+    // 'containerIndexes' is a FIFO that tells us the actual container of the 'indexMergeLine' line of 'mergeFileLines' array.
+    private static void Search(ArrayList outFileLines, Queue containerIndexes, ArrayList mergeFileLines, int indexMergeFile)
     {
-        string line;
-
-        for(int i = 0; i < mergeFileLines.Length; i++)
-        {
-            line = mergeFileLines[i];
-            bool isContainer = CheckContainer(line);
-            string word = getWord();
-
-        }
-    }
-
-    private static void Search(ArrayList outFileLines, int lastContainerIndex, ArrayList mergeFileLines, int indexMergeFile)
-    {
-        if(indexMergeFile == mergeFileLines.Length)
+        // There are not more lines to check
+        if(indexMergeFile == mergeFileLines.Count)
         {
             return;
         }
 
-        string word = GetWord(mergeFileLines[indexMergeFile]);
-        bool isContainer = CheckContainer(mergeFileLines[indexMergeFile]);
-        int outFileIndex;
+        string word = GetWord((string) mergeFileLines[indexMergeFile]);
+        bool openContainer = CheckOpenContainer((string) mergeFileLines[indexMergeFile]);
+        bool closeContainer = CheckCloseContainer((string) mergeFileLines[indexMergeFile]);
+        int outFileIndex = -1;
 
-        if((outFileIndex = Array.FindIndex(outFileLines, lastContainerIndex, element => element.Contains(word))) != -1)
+        if(!word.Equals(""))
         {
-            if(isContainer)
+            // Check if 'word' exists in 'outFileLines' array
+            for(int i = 0; i < outFileLines.Count; i++)
             {
-                lastContainerIndex = outFileIndex; 
-                Search(outFileLines, lastContainerIndex, mergeFileLines, ++indexMergeFile);
+                if(((string) outFileLines[i]).Contains(word))
+                {
+                    outFileIndex = 1;
+                    break;
+                }
+            }
+        }
+
+        // word is not in 'outFileLines' array
+        if(word.Equals("") || outFileIndex != -1)
+        {
+            if(openContainer)
+            {
+                containerIndexes.Enqueue(outFileIndex); 
+                Search(outFileLines, containerIndexes, mergeFileLines, ++indexMergeFile);
+            }
+
+            else if(closeContainer)
+            {
+                containerIndexes.Dequeue();
+                Search(outFileLines, containerIndexes, mergeFileLines, ++indexMergeFile);
             }
 
             else
             {
-                Search(outFileLines, lastContainerIndex, mergeFileLines, ++indexMergeFile);
+                Search(outFileLines, containerIndexes, mergeFileLines, ++indexMergeFile);
             }
         }
 
         else
         {
-            if(isContainer)
+            if(openContainer)
             {
-                CopyLines(outFileLines, lastContainerIndex, mergeFileLines, indexMergeFile, isContainer);
+                containerIndexes.Enqueue(outFileIndex);
+                CopyLines(outFileLines, containerIndexes, mergeFileLines, indexMergeFile, openContainer);
             }
 
             else
             {
-                CopyLines(outFileLines, lastContainerIndex, mergeFileLines, indexMergeFile, isContainer);
+                CopyLines(outFileLines, containerIndexes, mergeFileLines, indexMergeFile, openContainer);
             }
         }
     }
 
-    private static void CopyLines(ArrayList outFileLines, int lastContainerIndex ,ArrayList mergeFileLines, int indexMergeFile, bool isContainer)
+    private static void CopyLines(ArrayList outFileLines, Queue containerIndexes ,ArrayList mergeFileLines, int indexMergeFile, bool openContainer)
     {
         int innerContainer = 0;
+        int insertIndex = indexMergeFile;
+
+        if(openContainer)
+        {
+            insertIndex = ((int) containerIndexes.Peek()) + 1;
+        }
+        string line = (string) mergeFileLines[indexMergeFile];
+
+        outFileLines.Insert(insertIndex, formattedAppcoinsMainTemplate[indexMergeFile]);
+        indexMergeFile++;
+        insertIndex++;
+        innerContainer++;
 
         do
         {
-            string line = mergeFileLines[indexMergeFile];
+            line = (string) mergeFileLines[indexMergeFile];
 
             if(line.Contains("{"))
             {
                 innerContainer++;
             }
 
-            outFileLines.Insert(lastContainerIndex + 1, mergeFileLines[indexMergeFile]);
-        }
+            if(line.Contains("}"))
+            {
+                innerContainer--;
+            }
+
+            outFileLines.Insert(insertIndex, formattedAppcoinsMainTemplate[indexMergeFile]);
+            insertIndex++;
+            indexMergeFile++;
+        } while(innerContainer > 0);
+
+        containerIndexes.Dequeue();
+        Search(outFileLines, containerIndexes, mergeFileLines, indexMergeFile);
     }
 
-    private static GetWord(string line)
+    private static string GetWord(string line)
     {
         int wordLength = 0;
 
@@ -201,9 +186,14 @@ class SetupAndroidProject
         return line.Substring(0, wordLength);
     }
 
-    private static void CheckContainer(string line)
+    private static bool CheckOpenContainer(string line)
     {
-        return line.Contains("{") ? true : false;
+        return line.Contains("{");
+    }
+
+    private static bool CheckCloseContainer(string line)
+    {
+        return line.Contains("}");
     }
 }
 

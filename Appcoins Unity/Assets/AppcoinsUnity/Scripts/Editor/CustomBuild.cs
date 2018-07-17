@@ -25,6 +25,12 @@ public class CustomBuildMenuItem : EditorWindow
         int i = KMP.Matcher("abbaaaaaaaaaaaabbbbb", "bbb");
         UnityEngine.Debug.Log(i);
     }
+
+    [MenuItem("Custom Build/Setup mainTemplate.gradle")]
+    public static void setupMainTemplate()
+    {
+        SetupAndroidProject.SetupMainTemplate();
+    }
 }
 
 public class CustomBuild
