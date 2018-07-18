@@ -29,6 +29,12 @@ public class CustomBuildMenuItem : EditorWindow
     [MenuItem("Custom Build/Setup mainTemplate.gradle")]
     public static void setupMainTemplate()
     {
+        string a = "a a a\na a a";
+        string b = SetupAndroidProject.RemoveAllWhiteSpaces(a);
+
+        UnityEngine.Debug.Log(a);
+        UnityEngine.Debug.Log(b);
+
         SetupAndroidProject.SetupMainTemplate();
     }
 }
