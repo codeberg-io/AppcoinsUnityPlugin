@@ -2,17 +2,10 @@
 
 buildscript {
     repositories {
-    maven { url "https://dl.bintray.com/asf/asf" }
         jcenter()
         google()
     }
 
-  compile fileTree(dir: 'libs', excludes: ['com.android.support.support-annotations*.jar'], include: ['*.jar'])
-  packagingOptions {
-    doNotStrip "*/armeabi-v7a/*.so"
-    doNotStrip "*/x86/*.so"
-  }
-  api 'com.asfoundation:appcoins:0.3.6a'
     dependencies {
         classpath 'com.android.tools.build:gradle:3.0.1'
     }
@@ -34,11 +27,6 @@ dependencies {
 
 android {
     compileSdkVersion **APIVERSION**
-    multiDexEnabled true
-    compileOptions {
-      sourceCompatibility 1.8
-      targetCompatibility 1.8
-    }
     buildToolsVersion '**BUILDTOOLS**'
 
     defaultConfig {
@@ -54,17 +42,7 @@ android {
 
     lintOptions {
         abortOnError false
-      minifyEnabled false
-      useProguard false
-      resValue "bool", "APPCOINS_ENABLE_POA", "true"
-      resValue "bool", "APPCOINS_ENABLE_DEBUG", "true"
-      resValue "string", "APPCOINS_PREFAB", "AppcoinsUnity"
     }
-      minifyEnabled false
-      useProguard false
-      resValue "bool", "APPCOINS_ENABLE_POA", "true"
-      resValue "bool", "APPCOINS_ENABLE_DEBUG", "true"
-      resValue "string", "APPCOINS_PREFAB", "AppcoinsUnity"
 
     aaptOptions {
         noCompress '.unity3d', '.ress', '.resource', '.obb'**STREAMING_ASSETS**
@@ -85,4 +63,3 @@ android {
     }**PACKAGING_OPTIONS****SPLITS**
 **BUILT_APK_LOCATION**
 }**SPLITS_VERSION_CODE****SOURCE_BUILD_SETUP**
-
