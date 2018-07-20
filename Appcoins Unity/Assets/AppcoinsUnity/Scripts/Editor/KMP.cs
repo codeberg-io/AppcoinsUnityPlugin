@@ -54,7 +54,6 @@ public class KMP
             if(i == (prefix.Length - 1))
             {
                 return (q - prefix.Length + 1);
-                break;
             }
         }
 
