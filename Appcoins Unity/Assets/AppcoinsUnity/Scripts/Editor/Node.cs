@@ -8,6 +8,7 @@ public class TestTree
 {
     private static string appcoinsMainTemplate = UnityEngine.Application.dataPath + "/AppcoinsUnity/Plugins/Android/mainTemplate.gradle";
     private static string currentMainTemplate = UnityEngine.Application.dataPath + "/Plugins/Android/mainTemplate.gradle";
+    private static string mergedMainTemplate = UnityEngine.Application.dataPath + "/Plugins/Android/mergedTemplate.gradle";
 
     [MenuItem("TestTree/Print Tree")]
     public static void PrintTree()
@@ -17,7 +18,7 @@ public class TestTree
 
         tCurrent.TraverseDFS(tCurrent.GetRoot(), delegate(Node<string> node)
         {
-            // UnityEngine.Debug.Log(node.ToString() + " / " + node.ToString().Length);
+             //UnityEngine.Debug.Log(node.ToString() + " / " + node.ToString().Length);
         }, 
         delegate(Node<string> node){}, delegate(Node<string> node){}, delegate(Node<string> node){});
 
@@ -39,11 +40,11 @@ public class TestTree
 
         tCurrent.TraverseDFS(tCurrent.GetRoot(), delegate(Node<string> node)
         {
-            // UnityEngine.Debug.Log(node.ToString() + " / " + node.ToString().Length);
+             //UnityEngine.Debug.Log(node.ToString() + " / " + node.ToString().Length);
         }, 
         delegate(Node<string> node){}, delegate(Node<string> node){}, delegate(Node<string> node){});
 
-        Tree<string>.CreateFileFromTree(tAppcoins, currentMainTemplate, false, FileParser.BUILD_GRADLE);
+        Tree<string>.CreateFileFromTree(tAppcoins, mergedMainTemplate, false, FileParser.BUILD_GRADLE);
     }
 }
 
@@ -182,14 +183,14 @@ public class Node<T>
             i++;
         }
 
-        for(i = 0; i < itemParsed.Length; i++)
-        {
-            if(Char.IsPunctuation(itemParsed[i]))
-            {
-                i++;
-                itemParsed = itemParsed.Insert(i, " ");
-            }
-        }
+        //for(i = 0; i < itemParsed.Length; i++)
+        //{
+        //    if(Char.IsPunctuation(itemParsed[i]))
+        //    {
+        //        i++;
+        //        itemParsed = itemParsed.Insert(i, " ");
+        //    }
+        //}
 
         if(node.GetChildsCount() > 0)
         {
@@ -307,23 +308,23 @@ public class Tree<T>
             }
 
             // Remove spaces between punctiation marks
-            else if(allFile[i].Equals(' '))
-            {
-                if(i == allFile.Length)
-                {
-                    break;
-                }
+            //else if(allFile[i].Equals(' '))
+            //{
+            //    if(i == allFile.Length)
+            //    {
+            //        break;
+            //    }
 
-                else if(i > 0 && Char.IsLetter(allFile[i - 1]) && Char.IsLetter(allFile[i + 1]))
-                {
-                    newString += ' ';
-                }
+            //    else if(i > 0 && Char.IsLetter(allFile[i - 1]) && Char.IsLetter(allFile[i + 1]))
+            //    {
+            //        newString += ' ';
+            //    }
 
-                else
-                {
-                    continue;
-                }
-            }
+            //    else
+            //    {
+            //        continue;
+            //    }
+            //}
 
             else
             {
@@ -434,7 +435,10 @@ public class Tree<T>
             delegate(Node<T> node) {},
             delegate(Node<T> node) 
             {
-                if(i < path.Count && node.GetItem().Equals(nodeToFind.GetItem()))
+            string item1 = Regex.Replace(node.GetItem().ToString(), @"[^\w\.@-]", "");
+            string item2 = Regex.Replace(node.GetItem().ToString(), @"[^\w\.@-]", "");
+
+                if(i < path.Count && item1.Equals(item2))
                 {
                     lastPathNodeInTree = path[i];
                     i++;
@@ -493,6 +497,7 @@ public class Tree<T>
                 while(!path[path.Count - 1].Equals(node))
                 {
                     path.RemoveAt(path.Count - 1);
+                    path.RemoveAll(item => item == null);
                 }
             }, 
             delegate(Node<T> node)
@@ -505,9 +510,11 @@ public class Tree<T>
                 while(!path[path.Count - 1].Equals(node))
                 {
                     path.RemoveAt(path.Count - 1);
+                    path.RemoveAll(item => item == null);
                 }
 
                 path.RemoveAt(path.Count - 1);
+                path.RemoveAll(item => item == null);
             }
         );
     }
