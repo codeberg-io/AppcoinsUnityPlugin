@@ -43,7 +43,7 @@ public class TestTree
         }, 
         delegate(Node<string> node){}, delegate(Node<string> node){}, delegate(Node<string> node){});
 
-        Tree<string>.CreateFileFromTree(tCurrent, currentMainTemplate, false, FileParser.BUILD_GRADLE);
+        Tree<string>.CreateFileFromTree(tAppcoins, currentMainTemplate, false, FileParser.BUILD_GRADLE);
     }
 }
 
@@ -465,10 +465,12 @@ public class Tree<T>
     // Merge full path to tree (repeated nodes are not inserted)
     public void FindAndInsertPath(List<Node<T>> path, ref int pathIndex)
     {
+        UnityEngine.Debug.Log("Start");
         for(int i = 0; i < path.Count; i++)
         {
             UnityEngine.Debug.Log(path[i].ToString());
         }
+        UnityEngine.Debug.Log("End");
 
         Node<T> parent = FindPath(path, ref pathIndex);
         InsertPath(parent, path, ref pathIndex);
@@ -484,14 +486,11 @@ public class Tree<T>
             tree.GetRoot(), 
             delegate(Node<T> node)
             {
-                if(!node.Equals(tree.GetRoot()))
-                {
-                    path.Add(node);
-                }
+                path.Add(node);
             }, 
-            delegate(Node<T> node)
+            delegate(Node<T> node) 
             {
-                if(path.Count > 0)
+                while(!path[path.Count - 1].Equals(node))
                 {
                     path.RemoveAt(path.Count - 1);
                 }
@@ -503,10 +502,12 @@ public class Tree<T>
             },
             delegate(Node<T> node)
             {
-                if(path.Count > 0)
+                while(!path[path.Count - 1].Equals(node))
                 {
                     path.RemoveAt(path.Count - 1);
                 }
+
+                path.RemoveAt(path.Count - 1);
             }
         );
     }
@@ -525,16 +526,12 @@ public class Tree<T>
         if(currentNode.GetChildsCount() == 0)
         {
             leafAction(currentNode);
-            RetieveToParentNodeAction(currentNode);
-            return;
         }
 
         else
         {
             while(currentNode._indexChild < currentNode.GetChildsCount())
             {
-                NextNodeAction(currentNode);
-
                 TraverseDFS(
                     currentNode.GetChild(currentNode._indexChild), 
                     CurrentNodeAction, 
@@ -543,11 +540,13 @@ public class Tree<T>
                     RetieveToParentNodeAction
                 );
 
+                NextNodeAction(currentNode);
                 currentNode._indexChild++;
             }
 
-            RetieveToParentNodeAction(currentNode);
-            return;
         }
+
+        RetieveToParentNodeAction(currentNode);
+        return;
     }
 }
