@@ -16,7 +16,8 @@ public class ExportPackageAutomatically : ScriptableObject
             "ProcessCompleted.out",
             "BashCommand.sh",
             "AttemptMergeTemplate.gradle",
-            "MergedTemplate.gradle"
+            "MergedTemplate.gradle",
+            "oldMainTemplate.gradle"
         };
 
         // Complete path to folder to filter out (starting from Assets)
