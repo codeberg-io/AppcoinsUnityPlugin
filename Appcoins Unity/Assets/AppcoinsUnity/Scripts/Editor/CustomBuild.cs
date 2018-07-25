@@ -18,13 +18,6 @@ public class CustomBuildMenuItem : EditorWindow
         CustomBuild buildObj = new CustomBuild();
         buildObj.ExecuteCustomBuild("android");
     }
-
-    [MenuItem("Custom Build/KMP")]
-    public static void something()
-    {
-        int i = KMP.Matcher("abbaaaaaaaaaaaabbbbb", "bbb");
-        UnityEngine.Debug.Log(i);
-    }
 }
 
 public class CustomBuild
