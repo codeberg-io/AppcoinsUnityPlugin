@@ -14,7 +14,9 @@ public class ExportPackageAutomatically : ScriptableObject
         List<string> filesToRemove = new List<string> {
             "ExportPackageAutomatically.cs",
             "ProcessCompleted.out",
-            "BashCommand.sh"
+            "BashCommand.sh",
+            "AttemptMergeTemplate.gradle",
+            "MergedTemplate.gradle"
         };
 
         // Complete path to folder to filter out (starting from Assets)
