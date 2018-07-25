@@ -52,7 +52,7 @@ public class Startup
     {
         if(File.Exists(currentMainTemplate))
         {
-            File.Copy(currentMainTemplate, oldMainTemplate);
+            File.Copy(currentMainTemplate, oldMainTemplate, true);
 
             Tree<string> tCurrent = Tree<string>.CreateTreeFromFile(currentMainTemplate, FileParser.BUILD_GRADLE);
             Tree<string> tAppcoins = Tree<string>.CreateTreeFromFile(appcoinsMainTemplate, FileParser.BUILD_GRADLE);
@@ -63,7 +63,7 @@ public class Startup
 
         else
         {
-            File.Copy(appcoinsMainTemplate, currentMainTemplate)
+            File.Copy(appcoinsMainTemplate, currentMainTemplate, true);
         }
     }
 }
