@@ -641,15 +641,16 @@ Prefab:
       propertyPath: m_RootOrder
       value: 4
       objectReference: {fileID: 0}
-    - target: {fileID: 1087073868984312, guid: 53ffe963ba9e4624aac3b31b1619f682, type: 2}
-      propertyPath: m_Name
-      value: AppcoinsUnity1
-      objectReference: {fileID: 0}
     - target: {fileID: 114267058133941440, guid: 53ffe963ba9e4624aac3b31b1619f682,
         type: 2}
       propertyPath: purchaserObject
       value: 
       objectReference: {fileID: 1936063539}
+    - target: {fileID: 114267058133941440, guid: 53ffe963ba9e4624aac3b31b1619f682,
+        type: 2}
+      propertyPath: enableDebug
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 53ffe963ba9e4624aac3b31b1619f682, type: 2}
   m_IsPrefabAsset: 0

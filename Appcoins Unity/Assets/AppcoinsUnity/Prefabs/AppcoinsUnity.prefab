@@ -56,7 +56,7 @@ MonoBehaviour:
   enablePOA: 1
   enableDebug: 1
   products:
-  - {fileID: 11400000, guid: 0d15512d72769f74ab15ddca55592937, type: 2}
-  - {fileID: 11400000, guid: 650461753210374449ff8c3efd539ff5, type: 2}
-  - {fileID: 11400000, guid: 248b1346f3a05b341b2d93ed2f017be5, type: 2}
+  - {fileID: 11400000, guid: baf41b588cfc04e6d8e55174bd864afc, type: 2}
+  - {fileID: 11400000, guid: a469b8b57c1344a44af7d774601950c5, type: 2}
+  - {fileID: 11400000, guid: 838073ec28603444d8087977d5264853, type: 2}
   purchaserObject: {fileID: 0}
