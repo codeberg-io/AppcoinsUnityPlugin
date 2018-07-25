@@ -4,48 +4,48 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 
-public class TestTree
-{
-    private static string appcoinsMainTemplate = UnityEngine.Application.dataPath + "/AppcoinsUnity/Plugins/Android/mainTemplate.gradle";
-    private static string currentMainTemplate = UnityEngine.Application.dataPath + "/Plugins/Android/mainTemplate.gradle";
+// public class TestTree
+// {
+//     private static string appcoinsMainTemplate = UnityEngine.Application.dataPath + "/AppcoinsUnity/Plugins/Android/mainTemplate.gradle";
+//     private static string currentMainTemplate = UnityEngine.Application.dataPath + "/Plugins/Android/mainTemplate.gradle";
 
-    [MenuItem("TestTree/Print Tree")]
-    public static void PrintTree()
-    {
-        Tree<string> tCurrent = Tree<string>.CreateTreeFromFile(currentMainTemplate, FileParser.BUILD_GRADLE);
-        Tree<string> tAppcoins = Tree<string>.CreateTreeFromFile(appcoinsMainTemplate, FileParser.BUILD_GRADLE);
+//     [MenuItem("TestTree/Print Tree")]
+//     public static void PrintTree()
+//     {
+//         Tree<string> tCurrent = Tree<string>.CreateTreeFromFile(currentMainTemplate, FileParser.BUILD_GRADLE);
+//         Tree<string> tAppcoins = Tree<string>.CreateTreeFromFile(appcoinsMainTemplate, FileParser.BUILD_GRADLE);
 
-        tCurrent.TraverseDFS(tCurrent.GetRoot(), delegate(Node<string> node)
-        {
-            // UnityEngine.Debug.Log(node.ToString() + " / " + node.ToString().Length);
-        }, 
-        delegate(Node<string> node){}, delegate(Node<string> node){}, delegate(Node<string> node){});
+//         tCurrent.TraverseDFS(tCurrent.GetRoot(), delegate(Node<string> node)
+//         {
+//             // UnityEngine.Debug.Log(node.ToString() + " / " + node.ToString().Length);
+//         }, 
+//         delegate(Node<string> node){}, delegate(Node<string> node){}, delegate(Node<string> node){});
 
-        // UnityEngine.Debug.Log("");
-        // UnityEngine.Debug.Log("\nOtherFile\n");
-        // UnityEngine.Debug.Log("");
+//         // UnityEngine.Debug.Log("");
+//         // UnityEngine.Debug.Log("\nOtherFile\n");
+//         // UnityEngine.Debug.Log("");
 
-        tAppcoins.TraverseDFS(tAppcoins.GetRoot(), delegate(Node<string> node)
-        {
-            // UnityEngine.Debug.Log(node.ToString() + " / " + node.ToString().Length);
-        }, 
-        delegate(Node<string> node){}, delegate(Node<string> node){}, delegate(Node<string> node){});
+//         tAppcoins.TraverseDFS(tAppcoins.GetRoot(), delegate(Node<string> node)
+//         {
+//             // UnityEngine.Debug.Log(node.ToString() + " / " + node.ToString().Length);
+//         }, 
+//         delegate(Node<string> node){}, delegate(Node<string> node){}, delegate(Node<string> node){});
 
-        // UnityEngine.Debug.Log("");
-        // UnityEngine.Debug.Log("\nMergedTree\n");
-        // UnityEngine.Debug.Log("");
+//         // UnityEngine.Debug.Log("");
+//         // UnityEngine.Debug.Log("\nMergedTree\n");
+//         // UnityEngine.Debug.Log("");
 
-        tCurrent.MergeTrees(tAppcoins);
+//         tCurrent.MergeTrees(tAppcoins);
 
-        tCurrent.TraverseDFS(tCurrent.GetRoot(), delegate(Node<string> node)
-        {
-            // UnityEngine.Debug.Log(node.ToString() + " / " + node.ToString().Length);
-        }, 
-        delegate(Node<string> node){}, delegate(Node<string> node){}, delegate(Node<string> node){});
+//         tCurrent.TraverseDFS(tCurrent.GetRoot(), delegate(Node<string> node)
+//         {
+//             // UnityEngine.Debug.Log(node.ToString() + " / " + node.ToString().Length);
+//         }, 
+//         delegate(Node<string> node){}, delegate(Node<string> node){}, delegate(Node<string> node){});
 
-        Tree<string>.CreateFileFromTree(tAppcoins, currentMainTemplate, false, FileParser.BUILD_GRADLE);
-    }
-}
+//         Tree<string>.CreateFileFromTree(tCurrent, UnityEngine.Application.dataPath + "/Plugins/Android/AttemptMergeTemplate.gradle" , false, FileParser.BUILD_GRADLE);
+//     }
+// }
 
 // Node of a Tree or Graph
 public class Node<T>
@@ -182,14 +182,14 @@ public class Node<T>
             i++;
         }
 
-        for(i = 0; i < itemParsed.Length; i++)
-        {
-            if(Char.IsPunctuation(itemParsed[i]))
-            {
-                i++;
-                itemParsed = itemParsed.Insert(i, " ");
-            }
-        }
+        // for(i = 0; i < itemParsed.Length; i++)
+        // {
+        //     if(Char.IsPunctuation(itemParsed[i]))
+        //     {
+        //         i++;
+        //         itemParsed = itemParsed.Insert(i, " ");
+        //     }
+        // }
 
         if(node.GetChildsCount() > 0)
         {
@@ -207,6 +207,12 @@ public enum FileParser
 
 public class Tree<T>
 {
+    private static string[] stringsToRemove = {
+        "implementationfileTree(dir:'libs',include:['*.jar'])",
+        "compilefileTree(dir:'libs',include:['*.jar'])",
+        "apifileTree(dir:'libs',include:['*.jar'])"
+    };
+
     // Height of the tree
     private int _height;
 
@@ -226,6 +232,21 @@ public class Tree<T>
     public Node<T> GetRoot()
     {
         return _root;
+    }
+
+    public int GetHeight()
+    {
+        return _height;
+    }
+
+    private static bool StringBlackList(string s)
+    {
+        if(Array.Exists(Tree<T>.stringsToRemove, arrayString => arrayString.Contains(s)))
+        {
+            return true;
+        }
+
+        return false;
     }
 
     // Create tree from a file (T = string)
@@ -280,8 +301,10 @@ public class Tree<T>
             // Create new child node (leaf)
             else if(allFile[i].Equals('\n'))
             {
+                string aux = newString.Replace(" ", "");
                 if(newString.Length > 0)
                 {
+                    
                     currentNode.AddChild(new Node<string>(newString, currentNode));
                 }
 
@@ -307,23 +330,23 @@ public class Tree<T>
             }
 
             // Remove spaces between punctiation marks
-            else if(allFile[i].Equals(' '))
-            {
-                if(i == allFile.Length)
-                {
-                    break;
-                }
+            // else if(allFile[i].Equals(' '))
+            // {
+            //     if(i == allFile.Length)
+            //     {
+            //         break;
+            //     }
 
-                else if(i > 0 && Char.IsLetter(allFile[i - 1]) && Char.IsLetter(allFile[i + 1]))
-                {
-                    newString += ' ';
-                }
+            //     else if(i > 0 && Char.IsLetter(allFile[i - 1]) && Char.IsLetter(allFile[i + 1]))
+            //     {
+            //         newString += ' ';
+            //     }
 
-                else
-                {
-                    continue;
-                }
-            }
+            //     else
+            //     {
+            //         continue;
+            //     }
+            // }
 
             else
             {
@@ -354,14 +377,17 @@ public class Tree<T>
             t.GetRoot(),
             delegate(Node<T> node)
             {
-                string s = Node<T>.ParseItem(node, node.GetDepth());
-                fileWriter.WriteLine(s);
+                if(!Tree<T>.StringBlackList(node.ToString().Replace(" ", "")) && !node.ToString().Equals("root"))
+                {
+                    string s = Node<T>.ParseItem(node, node.GetDepth() - 1);
+                    fileWriter.WriteLine(s);
+                }
             },
             delegate(Node<T> node) {},
             delegate(Node<T> node) {},
             delegate(Node<T> node)
             {
-                if(node.GetChildsCount() > 0)
+                if(node.GetChildsCount() > 0 && !node.ToString().Equals("root"))
                 {
                     int i = 0;
                     int depth = node.GetDepth();
@@ -424,31 +450,36 @@ public class Tree<T>
     // If a path's node exists in the tree that node is removed from the 'path' list.
     private Node<T> FindPath(List<Node<T>> path, ref int pathIndex)
     {
-        int i = pathIndex;
-        Node<T> nodeToFind = path[i];
-        Node<T> lastPathNodeInTree = _root;  // Last path node that is in the tree.
+        Node<T> nodeToFind = path[++pathIndex];
+        Node<T> currentTreeNode = _root;
 
-        TreeBFS(
-            _root,
-            delegate(Node<T> node) {},
-            delegate(Node<T> node) {},
-            delegate(Node<T> node) 
+        while(true)
+        {
+            Node<T> aux = currentTreeNode.FindChild(node => node.ToString().Replace(" ", "").Equals(nodeToFind.ToString().Replace(" ", "")));
+
+            if(aux == null)
             {
-                if(i < path.Count && node.GetItem().Equals(nodeToFind.GetItem()))
-                {
-                    lastPathNodeInTree = path[i];
-                    i++;
+                break;
+            }
 
-                    if(i < path.Count)
-                    {
-                        nodeToFind = path[i];
-                    }
+            else
+            {
+                currentTreeNode = aux;
+                pathIndex++;
+
+                if(pathIndex < path.Count)
+                {
+                    nodeToFind = path[pathIndex];
+                }
+
+                else
+                {
+                    break;
                 }
             }
-        );
+        }
 
-        pathIndex = i;
-        return lastPathNodeInTree;
+        return currentTreeNode;
     }
 
     // Insert new path to tree
@@ -456,8 +487,10 @@ public class Tree<T>
     {
        while(pathIndex < path.Count)
        {
-           parentTreeNode.AddChild(path[pathIndex]);
-           parentTreeNode = path[pathIndex];
+           Node<T> nodeToCopy = path[pathIndex];
+           Node<T> newTreeNode = new Node<T>(nodeToCopy.GetItem(), nodeToCopy.GetParent());
+           parentTreeNode.AddChild(newTreeNode);
+           parentTreeNode = newTreeNode;
            pathIndex++;
        }
     }
@@ -465,12 +498,6 @@ public class Tree<T>
     // Merge full path to tree (repeated nodes are not inserted)
     public void FindAndInsertPath(List<Node<T>> path, ref int pathIndex)
     {
-        UnityEngine.Debug.Log("Start");
-        for(int i = 0; i < path.Count; i++)
-        {
-            UnityEngine.Debug.Log(path[i].ToString());
-        }
-        UnityEngine.Debug.Log("End");
 
         Node<T> parent = FindPath(path, ref pathIndex);
         InsertPath(parent, path, ref pathIndex);
@@ -479,7 +506,7 @@ public class Tree<T>
     // Merge this.Tree with tree (puplicate nodes are discarded).
     public void MergeTrees(Tree<T> tree)
     {
-        List<Node<T>> path = new List<Node<T>>();
+        List<Node<T>> path = new List<Node<T>>(tree.GetHeight() + 1);
         int index = 0;
 
         TraverseDFS(
@@ -487,13 +514,11 @@ public class Tree<T>
             delegate(Node<T> node)
             {
                 path.Add(node);
+                // UnityEngine.Debug.Log(internalIndex);
             }, 
             delegate(Node<T> node) 
             {
-                while(!path[path.Count - 1].Equals(node))
-                {
-                    path.RemoveAt(path.Count - 1);
-                }
+                // path[internalIndex--] = null;
             }, 
             delegate(Node<T> node)
             {
@@ -502,11 +527,6 @@ public class Tree<T>
             },
             delegate(Node<T> node)
             {
-                while(!path[path.Count - 1].Equals(node))
-                {
-                    path.RemoveAt(path.Count - 1);
-                }
-
                 path.RemoveAt(path.Count - 1);
             }
         );
@@ -520,20 +540,22 @@ public class Tree<T>
         Action<Node<T>> leafAction,
         Action<Node<T>> RetieveToParentNodeAction
     ) {
-        currentNode._indexChild = 0;
+        int indexChild = 0;
+        int childsCount = currentNode.GetChildsCount();
+
         CurrentNodeAction(currentNode);
 
-        if(currentNode.GetChildsCount() == 0)
+        if(childsCount == 0)
         {
             leafAction(currentNode);
         }
 
         else
         {
-            while(currentNode._indexChild < currentNode.GetChildsCount())
+            while(indexChild < childsCount)
             {
                 TraverseDFS(
-                    currentNode.GetChild(currentNode._indexChild), 
+                    currentNode.GetChild(indexChild), 
                     CurrentNodeAction, 
                     NextNodeAction, 
                     leafAction,
@@ -541,7 +563,7 @@ public class Tree<T>
                 );
 
                 NextNodeAction(currentNode);
-                currentNode._indexChild++;
+                indexChild++;
             }
 
         }
